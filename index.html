@@ -570,8 +570,8 @@
 
         function buyHint() {
             if(questionAnswered) return;
-            if (state.points >= state.indiceCost) {
-                state.points -= state.indiceCost;
+            if (state.points >= 15) {
+                state.points -= 15;
                 updateDashboard();
                 saveOnly();
                 document.getElementById('hint-btn').classList.add('hidden');
