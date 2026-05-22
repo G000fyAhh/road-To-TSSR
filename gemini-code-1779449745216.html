@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Road to TSSR</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .locked { opacity: 0.5; filter: grayscale(0.5); }
+        .module-card { transition: all 0.2s ease; }
+        .module-card:hover:not(.locked) { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        .toast-enter { animation: slideIn 0.3s ease-out forwards; }
+        .toast-exit { animation: fadeOut 0.3s ease-out forwards; }
+        
+        .prose h3 { font-size: 1.125rem; font-weight: 700; margin-bottom: 0.5rem; color: #1e293b; }
+        .prose p, .prose ul { color: #475569; font-size: 0.875rem; line-height: 1.5; margin-bottom: 0.75rem; }
+        .prose ul { list-style-type: disc; padding-left: 1.5rem; }
+        .prose strong { color: #0f172a; }
+        .prose code { background: #f1f5f9; padding: 2px 4px; border-radius: 4px; font-family: monospace; color: #2563eb; font-size: 0.8rem; }
+        
+        .opt-btn { transition: all 0.2s ease; }
+        .opt-correct { background-color: #ecfdf5 !important; border-color: #10b981 !important; color: #047857 !important; }
+        .opt-wrong { background-color: #fef2f2 !important; border-color: #ef4444 !important; color: #b91c1c !important; }
+        .opt-disabled { opacity: 0.6; cursor: not-allowed; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen antialiased pb-16">
+
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-6xl mx-auto px-6 py-4">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center gap-4">
+                    <!-- h-16 (64px) sur mobile, h-20 (80px) sur grand écran -->
+                    <img src="logo.png" alt="Road to TSSR" class="h-16 md:h-20 w-auto object-contain">
+                    
+                    <div>
+                        <h1 class="sr-only">Road to TSSR</h1>
+                        <p class="text-sm text-slate-500 font-medium whitespace-nowrap">Plateforme d'entraînement</p>
+                    </div>
+                </div>
+                
+                <div class="flex gap-4">
+                    <div class="bg-slate-50 px-4 py-2 rounded-lg border border-slate-200 text-sm text-center">
+                        <span class="block text-slate-500 text-[10px] uppercase font-bold">Précision</span>
+                        <span id="stats-display" class="font-semibold text-slate-700">0%</span>
+                    </div>
+                    <div class="bg-blue-50 px-4 py-2 rounded-lg border border-blue-100 text-center">
+                        <span class="block text-blue-800 text-[10px] font-bold uppercase">Points</span>
+                        <span id="score-display" class="text-xl font-bold text-blue-600 leading-none">0</span>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="flex justify-between text-[10px] font-bold text-slate-500 mb-1 uppercase">
+                    <span>Progression</span>
+                    <span id="progress-text">0%</span>
+                </div>
+                <div class="w-full bg-slate-200 rounded-full h-1.5">
+                    <div id="progress-bar" class="bg-blue-600 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6 py-8">
+        <div class="mb-8 flex justify-between items-end">
+            <h2 class="text-xl font-bold text-slate-800">Catalogue des Modules</h2>
+            <button onclick="requestReset()" class="text-xs text-red-500 hover:text-red-700 font-medium transition-colors">Réinitialiser la progression</button>
+        </div>
+        <div id="chapters-container" class="space-y-10"></div>
+    </main>
+
+   <!-- Modale Quiz -->
+    <div id="quiz-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-[60]">
+        <div class="bg-white w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                <h3 id="quiz-title" class="font-bold text-slate-800 truncate pr-4">Titre</h3>
+                <div class="flex items-center gap-4 shrink-0">
+                    <span class="text-xs font-bold text-blue-700 bg-blue-100 px-2 py-1 rounded-md">Points : <span id="modal-score-display">0</span></span>
+                    <button onclick="closeQuizModal()" class="text-slate-400 hover:text-slate-600 transition-colors text-sm font-medium">Abandonner</button>
+                </div>
+            </div>
+            <div id="quiz-content" class="p-6 overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <!-- Modale Reset -->
+    <div id="confirm-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-6 z-[70]">
+        <div class="bg-white w-full max-w-sm rounded-xl shadow-2xl p-6 border border-slate-200 text-center">
+            <h3 class="text-lg font-bold text-slate-900 mb-2">Tout effacer ?</h3>
+            <p class="text-sm text-slate-500 mb-6">Action irréversible.</p>
+            <div class="flex gap-3 justify-center">
+                <button onclick="closeConfirmModal()" class="px-4 py-2 rounded-lg text-slate-600 bg-slate-100 hover:bg-slate-200 font-medium">Annuler</button>
+                <button onclick="executeReset()" class="px-4 py-2 rounded-lg text-white bg-red-500 hover:bg-red-600 font-medium">Réinitialiser</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="fixed bottom-6 right-6 z-[80] flex flex-col gap-3"></div>
+
+    <script>
+        const defaultState = { points: 100, unlocked: [], completions: {}, moduleScores: {}, stats: { correct: 0, wrong: 0 } };
+        let state = JSON.parse(localStorage.getItem('tssr_v11')) || defaultState;
+
+        const chapters = [
+            { id: 'net', title: 'Infrastructures Réseaux' },
+            { id: 'lin', title: 'Administration Linux' },
+            { id: 'win', title: 'Écosystème Windows Server' },
+            { id: 'virt', title: 'Virtualisation & Sécurité' }
+        ];
+
+        const modules = [
+            { id: 'osi', chapId: 'net', title: 'Modèle OSI & TCP/IP', price: 10 },
+            { id: 'ipv4', chapId: 'net', title: 'Adressage IPv4', price: 15 },
+            { id: 'ipv6', chapId: 'net', title: 'Introduction IPv6', price: 15 },
+            { id: 'vlan', chapId: 'net', title: 'Concepts VLANs', price: 20 },
+            { id: 'cisco', chapId: 'net', title: 'CLI Cisco de base', price: 25 },
+            { id: 'dhcp-dns', chapId: 'net', title: 'DHCP & DNS', price: 20 },
+            { id: 'lin-cmd', chapId: 'lin', title: 'Nav. & Fichiers', price: 10 },
+            { id: 'lin-perm', chapId: 'lin', title: 'Droits (chmod/chown)', price: 15 },
+            { id: 'lin-srv', chapId: 'lin', title: 'Services (systemctl)', price: 20 },
+            { id: 'lin-apt', chapId: 'lin', title: 'Paquets (APT)', price: 15 },
+            { id: 'lin-lvm', chapId: 'lin', title: 'Stockage LVM', price: 25 },
+            { id: 'lin-bash', chapId: 'lin', title: 'Bases Bash', price: 25 },
+            { id: 'win-ad', chapId: 'win', title: 'Concepts AD DS', price: 15 },
+            { id: 'win-gpo', chapId: 'win', title: 'Stratégies (GPO)', price: 20 },
+            { id: 'win-wds', chapId: 'win', title: 'Déploiement WDS', price: 20 },
+            { id: 'win-mdt', chapId: 'win', title: 'Automatisation MDT', price: 25 },
+            { id: 'win-ps', chapId: 'win', title: 'Bases PowerShell', price: 25 },
+            { id: 'win-fs', chapId: 'win', title: 'Droits NTFS', price: 15 },
+            { id: 'virt-prox', chapId: 'virt', title: 'Hyperviseurs & Proxmox', price: 20 },
+            { id: 'virt-cont', chapId: 'virt', title: 'Concepts Conteneurs', price: 20 },
+            { id: 'sec-fw', chapId: 'virt', title: 'Pare-feu & Iptables', price: 20 },
+            { id: 'sec-vpn', chapId: 'virt', title: 'Concepts VPN', price: 25 }
+        ];
+
+
+
+
+
+
+
+
+
+        const quizDatabase = {
+            // --- RESEAU ---
+            'osi': {
+                course: `<div class="prose"><h3>Le Modèle OSI</h3><p>Standard de communication réseau en 7 couches.</p><ul><li><strong>L7 Application:</strong> HTTP, FTP.</li><li><strong>L4 Transport:</strong> TCP (fiable) / UDP (rapide). PDU: Segment.</li><li><strong>L3 Réseau:</strong> Adressage IP, Routage. PDU: Paquet.</li><li><strong>L2 Liaison:</strong> Adressage MAC, Switch. PDU: Trame.</li></ul></div>`,
+                questions: [
+                    { q: "Quelle couche gère le routage des paquets IP ?", options: ["Couche 2 (Liaison)", "Couche 3 (Réseau)", "Couche 4 (Transport)"], correct: 1, hint: "C'est la couche où travaillent les routeurs." },
+                    { q: "Quel protocole de la couche 4 garantit la livraison des données ?", options: ["TCP", "UDP", "IP"], correct: 0, hint: "Il fonctionne en mode connecté." }
+                ]
+            },
+            'ipv4': {
+                course: `<div class="prose"><h3>Adressage IPv4</h3><p>Une IPv4 = 32 bits (4 octets). Le <strong>Masque de sous-réseau</strong> sépare la partie Réseau de la partie Hôte.</p><p>Adresses privées : <code>10.0.0.0/8</code>, <code>172.16.0.0/12</code>, <code>192.168.0.0/16</code>.</p></div>`,
+                questions: [
+                    { q: "Quel est le masque décimal pour un CIDR /24 ?", options: ["255.0.0.0", "255.255.0.0", "255.255.255.0"], correct: 2, hint: "Cela représente 24 bits à 1." },
+                    { q: "Laquelle de ces adresses est une IP privée ?", options: ["8.8.8.8", "192.168.1.50", "17.253.144.10"], correct: 1, hint: "Regarde la classe C définie dans la RFC 1918." }
+                ]
+            },
+            'ipv6': {
+                course: `<div class="prose"><h3>IPv6 en bref</h3><p>Codé sur <strong>128 bits</strong> en hexadécimal (ex: <code>fe80::1</code>).</p><ul><li><strong>Link-local (FE80::/10):</strong> Valable uniquement sur le réseau local (comme APIPA).</li><li><strong>Global Unicast (2000::/3):</strong> Routable sur Internet public.</li></ul></div>`,
+                questions: [
+                    { q: "Combien de bits comporte une adresse IPv6 ?", options: ["32 bits", "64 bits", "128 bits"], correct: 2, hint: "C'est 4 fois plus long qu'une IPv4." },
+                    { q: "Quel préfixe correspond à une adresse 'Link-Local' ?", options: ["FE80::", "2001::", "FC00::"], correct: 0, hint: "Commence par FE..." }
+                ]
+            },
+            'vlan': {
+                course: `<div class="prose"><h3>Les VLANs</h3><p>Un VLAN (Virtual LAN) sépare logiquement un réseau physique en plusieurs domaines de diffusion distincts.</p><p>Norme d'encapsulation : <strong>802.1Q</strong> (ajoute un tag).<br>Port <strong>Access</strong> = 1 seul VLAN. Port <strong>Trunk</strong> = Plusieurs VLANs.</p></div>`,
+                questions: [
+                    { q: "Quel est le but principal d'un VLAN ?", options: ["Augmenter le débit", "Segmenter logiquement le réseau", "Remplacer le routage"], correct: 1, hint: "Pense 'isolation'." },
+                    { q: "Quel standard IEEE gère le tagging des VLANs sur un port Trunk ?", options: ["802.11", "802.1X", "802.1Q"], correct: 2, hint: "La lettre magique est Q." }
+                ]
+            },
+            'cisco': {
+                course: `<div class="prose"><h3>CLI Cisco</h3><ul><li><code>></code> Mode Utilisateur</li><li><code>#</code> Mode Privilégié (via <code>enable</code>)</li><li><code>(config)#</code> Mode Configuration (via <code>configure terminal</code>)</li></ul><p>Sauvegarde : <code>copy running-config startup-config</code>.</p></div>`,
+                questions: [
+                    { q: "Quelle commande permet de passer du mode Utilisateur au mode Privilégié ?", options: ["configure terminal", "enable", "admin"], correct: 1, hint: "En français : 'activer'." },
+                    { q: "Comment sauvegarde-t-on la configuration active ?", options: ["copy running-config startup-config", "save all", "write memory-config"], correct: 0, hint: "On copie ce qui 'tourne' vers le 'démarrage'." }
+                ]
+            },
+            'dhcp-dns': {
+                course: `<div class="prose"><h3>DHCP & DNS</h3><p><strong>DHCP :</strong> Distribue les IP. Séquence <strong>DORA</strong> (Discover, Offer, Request, Acknowledge).</p><p><strong>DNS :</strong> Résout les noms en IP. Enregistrement <code>A</code> = Nom vers IPv4. <code>CNAME</code> = Alias.</p></div>`,
+                questions: [
+                    { q: "Que signifie le 'D' dans la séquence DHCP DORA ?", options: ["Domain", "Discover", "Deliver"], correct: 1, hint: "Le client cherche le serveur dans un premier temps." },
+                    { q: "Quel enregistrement DNS associe un nom de domaine à une adresse IPv4 ?", options: ["CNAME", "MX", "Enregistrement A"], correct: 2, hint: "C'est la première lettre de l'alphabet." }
+                ]
+            },
+
+            // --- LINUX ---
+            'lin-cmd': {
+                course: `<div class="prose"><h3>Navigation Linux</h3><ul><li><code>pwd</code> : Dossier actuel</li><li><code>ls -la</code> : Lister tout (même cachés)</li><li><code>cd /var/log</code> : Se déplacer</li><li><code>grep</code> : Chercher du texte</li><li><code>cat</code> : Lire un fichier</li></ul></div>`,
+                questions: [
+                    { q: "Quelle commande cherche un mot spécifique dans un fichier texte ?", options: ["find", "grep", "search"], correct: 1, hint: "Acronyme de Global Regular Expression Print." },
+                    { q: "Comment lister TOUS les fichiers (même cachés) ?", options: ["ls -l", "ls -a", "dir /all"], correct: 1, hint: "Le paramètre correspond à 'all'." }
+                ]
+            },
+            'lin-perm': {
+                course: `<div class="prose"><h3>Droits Linux</h3><p>Format : <strong>Proprio | Groupe | Autres</strong>. <br>Droits : <code>r</code> (4), <code>w</code> (2), <code>x</code> (1).</p><p>Ex: <code>chmod 755 fichier</code> donne rwx (7) au proprio, rx (5) aux autres.<br><code>chown user:group</code> change le propriétaire.</p></div>`,
+                questions: [
+                    { q: "À quelle valeur numérique correspond la lecture (r) ?", options: ["1", "2", "4"], correct: 2, hint: "x=1, w=2, r=?" },
+                    { q: "Que fait 'chmod 777' ?", options: ["Tous les droits à tous", "Bloque le fichier", "Exécutable uniquement"], correct: 0, hint: "4+2+1 = 7 (rwx)." }
+                ]
+            },
+            'lin-srv': {
+                course: `<div class="prose"><h3>Systemd (systemctl)</h3><p>Gestionnaire de services sous Linux.</p><ul><li><code>systemctl start apache2</code> : Démarre le service</li><li><code>systemctl enable apache2</code> : Lancement auto au boot</li><li><code>systemctl status apache2</code> : Vérifie l'état</li></ul></div>`,
+                questions: [
+                    { q: "Quelle commande active un service au démarrage de la machine ?", options: ["systemctl start", "systemctl boot", "systemctl enable"], correct: 2, hint: "Il faut l'habiliter." },
+                    { q: "Comment vérifier si un service a planté ?", options: ["systemctl status", "systemctl check", "systemctl log"], correct: 0, hint: "On demande son statut." }
+                ]
+            },
+            'lin-apt': {
+                course: `<div class="prose"><h3>Gestion APT (Debian/Ubuntu)</h3><p>Outil de gestion de paquets (Advanced Package Tool).</p><ul><li><code>apt update</code> : Met à jour la liste des paquets dispo</li><li><code>apt upgrade</code> : Installe les mises à jour</li><li><code>apt purge</code> : Désinstalle un paquet ET ses configs</li></ul></div>`,
+                questions: [
+                    { q: "Que fait 'apt update' ?", options: ["Met à jour le système entier", "Rafraîchit la liste des paquets", "Désinstalle les vieux paquets"], correct: 1, hint: "Ne télécharge pas de nouveaux logiciels, juste l'index." },
+                    { q: "Comment supprimer un logiciel ET ses fichiers de configuration ?", options: ["apt remove", "apt delete", "apt purge"], correct: 2, hint: "Une suppression totale." }
+                ]
+            },
+            'lin-lvm': {
+                course: `<div class="prose"><h3>Stockage LVM</h3><p>Gestion logique des volumes pour plus de flexibilité.</p><ol><li><strong>PV (Physical Volume) :</strong> Disques physiques.</li><li><strong>VG (Volume Group) :</strong> Regroupe les PV.</li><li><strong>LV (Logical Volume) :</strong> Les partitions finales à formater.</li></ol></div>`,
+                questions: [
+                    { q: "Quel est l'ordre logique de création en LVM ?", options: ["LV -> VG -> PV", "PV -> VG -> LV", "VG -> PV -> LV"], correct: 1, hint: "Physique -> Groupe -> Logique." },
+                    { q: "Quel est le grand avantage de LVM ?", options: ["Plus rapide qu'un RAID", "Redimensionner à chaud sans reboot", "Chiffre les données par défaut"], correct: 1, hint: "Flexibilité." }
+                ]
+            },
+            'lin-bash': {
+                course: `<div class="prose"><h3>Scripts Bash</h3><p>Un script commence toujours par le Shebang : <code>#!/bin/bash</code>.</p><p>Il faut le rendre exécutable avec : <code>chmod +x script.sh</code>.<br>On l'exécute avec : <code>./script.sh</code>.</p></div>`,
+                questions: [
+                    { q: "Comment appelle-t-on la première ligne '#!/bin/bash' ?", options: ["Le header", "Le shebang", "L'init"], correct: 1, hint: "Mot composé de 'hash' et 'bang'." },
+                    { q: "Quelle commande rend le script exécutable ?", options: ["chmod +e", "chmod +x", "chown +x"], correct: 1, hint: "x pour eXecute." }
+                ]
+            },
+
+            // --- WINDOWS ---
+            'win-ad': {
+                course: `<div class="prose"><h3>Active Directory (AD DS)</h3><p>Annuaire basé sur LDAP et Kerberos (authentification).</p><ul><li><strong>Domaine :</strong> Frontière logique et de sécurité.</li><li><strong>OU :</strong> Unité Organisationnelle pour classer (PC/Users) et appliquer des GPO.</li></ul></div>`,
+                questions: [
+                    { q: "Quel protocole gère l'authentification dans l'AD ?", options: ["NTLM", "Kerberos", "LDAP"], correct: 1, hint: "Le chien à 3 têtes." },
+                    { q: "À quoi sert une OU ?", options: ["Créer un domaine", "Regrouper des objets pour appliquer des GPO", "Faire des sauvegardes"], correct: 1, hint: "C'est un dossier d'organisation." }
+                ]
+            },
+            'win-gpo': {
+                course: `<div class="prose"><h3>Stratégies de Groupe (GPO)</h3><p>Déploiement de configs (sécurité, lecteurs).</p><ul><li><strong>Config Ordinateur :</strong> S'applique au démarrage du PC.</li><li><strong>Config Utilisateur :</strong> S'applique à l'ouverture de session.</li></ul><p>Forcer la MAJ : <code>gpupdate /force</code>.</p></div>`,
+                questions: [
+                    { q: "Quand s'applique la 'Configuration Utilisateur' d'une GPO ?", options: ["Au démarrage du PC", "À l'ouverture de session", "À minuit"], correct: 1, hint: "Le PC doit savoir qui se connecte." },
+                    { q: "Quelle commande force l'actualisation locale des GPO ?", options: ["gpupdate /force", "gpo /sync", "update-ad"], correct: 0, hint: "Group Policy Update." }
+                ]
+            },
+            'win-wds': {
+                course: `<div class="prose"><h3>WDS (Windows Deployment Services)</h3><p>Rôle serveur permettant d'installer Windows par le réseau sans clé USB.</p><p>S'appuie sur le protocole <strong>PXE</strong> (Preboot eXecution Environment) pour démarrer la carte réseau avant l'OS. Nécessite un DHCP et un DNS.</p></div>`,
+                questions: [
+                    { q: "Quel protocole permet à un PC de booter sur le réseau ?", options: ["TFTP", "PXE", "NTP"], correct: 1, hint: "Preboot eXecution Environment." },
+                    { q: "WDS nécessite la présence obligatoire de quel autre service ?", options: ["DHCP", "IIS", "Hyper-V"], correct: 0, hint: "Le PC a besoin d'une IP pour joindre le serveur WDS." }
+                ]
+            },
+            'win-mdt': {
+                course: `<div class="prose"><h3>MDT (Microsoft Deployment Toolkit)</h3><p>Outil d'automatisation de déploiement (gratuit).</p><p>Contrairement à WDS (qui distribue l'image), MDT permet de créer des <strong>Séquences de Tâches</strong> (Task Sequences) pour installer des logiciels, injecter des drivers et joindre le domaine de façon "Zero Touch".</p></div>`,
+                questions: [
+                    { q: "Quel est le concept clé de MDT pour automatiser l'installation ?", options: ["Les GPO", "Les Task Sequences", "Les Scripts Batch"], correct: 1, hint: "Séquences de tâches en anglais." },
+                    { q: "MDT et WDS sont-ils concurrents ou complémentaires ?", options: ["Concurrents", "Complémentaires"], correct: 1, hint: "WDS amorce, MDT automatise." }
+                ]
+            },
+            'win-ps': {
+                course: `<div class="prose"><h3>PowerShell</h3><p>Langage de script Microsoft orienté <strong>Objet</strong> (contrairement à Bash qui est orienté texte).</p><p>Verbes standards : <code>Get</code>, <code>Set</code>, <code>New</code>, <code>Remove</code>.<br>Commande de survie : <code>Get-Help Nom-Cmdlet -Examples</code>.</p></div>`,
+                questions: [
+                    { q: "Quelle est la grande différence de PowerShell face à cmd ?", options: ["Il est plus lent", "Il est orienté Objet", "Il ne marche que sur Windows"], correct: 1, hint: "Il manipule des structures de données complexes, pas juste du texte." },
+                    { q: "Comment obtenir la doc d'une commande ?", options: ["man cmd", "Get-Help cmd", "info cmd"], correct: 1, hint: "Obtenir l'aide." }
+                ]
+            },
+            'win-fs': {
+                course: `<div class="prose"><h3>NTFS & Partages</h3><p>Double couche de sécurité sur Windows :</p><ol><li><strong>Droits de Partage :</strong> Sécurité réseau (souvent 'Tout le monde: Contrôle Total').</li><li><strong>Droits NTFS :</strong> Sécurité réelle sur le disque (Propriétaire, Lecture, Modif).</li></ol><p>La règle : Le droit effectif est <strong>le plus restrictif</strong> des deux.</p></div>`,
+                questions: [
+                    { q: "Si un partage autorise la Lecture, mais NTFS autorise la Modification, que peut faire l'utilisateur par le réseau ?", options: ["Modifier", "Lire seulement", "Rien"], correct: 1, hint: "La règle du plus restrictif l'emporte." },
+                    { q: "Lequel gère la sécurité même si on se connecte localement (devant le PC) ?", options: ["Le Partage", "Le NTFS", "Le Pare-feu"], correct: 1, hint: "C'est le système de fichiers physique." }
+                ]
+            },
+
+            // --- VIRT & SEC ---
+            'virt-prox': {
+                course: `<div class="prose"><h3>Proxmox VE</h3><p>Hyperviseur Bare-Metal (Type 1) open-source basé sur Debian.</p><ul><li><strong>KVM :</strong> Machine Virtuelle complète (noyau séparé).</li><li><strong>LXC :</strong> Conteneurs Linux (partage le noyau Proxmox, ultra léger).</li></ul></div>`,
+                questions: [
+                    { q: "Sur quel OS de base tourne Proxmox ?", options: ["Ubuntu", "CentOS", "Debian"], correct: 2, hint: "L'OS avec la spirale rouge." },
+                    { q: "Que signifie un hyperviseur de Type 1 ?", options: ["Il s'installe dans Windows", "Il s'installe directement sur le matériel (Bare-Metal)", "Il ne fait que des conteneurs"], correct: 1, hint: "Pas de système hôte intermédiaire." }
+                ]
+            },
+            'virt-cont': {
+                course: `<div class="prose"><h3>Conteneurisation</h3><p>Ex: Docker, LXC. Contrairement aux VMs, les conteneurs n'embarquent pas leur propre système d'exploitation.</p><p>Ils <strong>partagent le noyau (Kernel)</strong> de l'hôte, ce qui les rend extrêmement rapides à démarrer et peu gourmands en RAM/CPU.</p></div>`,
+                questions: [
+                    { q: "Quelle est la principale différence entre une VM et un conteneur ?", options: ["Le conteneur partage le Kernel hôte", "La VM est plus rapide", "Le conteneur n'a pas d'IP"], correct: 0, hint: "Pas d'OS complet à démarrer." },
+                    { q: "Dans Proxmox, quelle techno est utilisée pour les conteneurs ?", options: ["Docker", "Kubernetes", "LXC"], correct: 2, hint: "Linux Containers." }
+                ]
+            },
+            'sec-fw': {
+                course: `<div class="prose"><h3>Pare-feu (Firewall)</h3><p>Filtre les flux réseaux (IP, Ports, Protocoles).</p><p>Un pare-feu moderne est <strong>Stateful (à états)</strong> : s'il autorise un PC à sortir vers Internet, il autorise automatiquement le trafic retour (la réponse) sans qu'on crée de règle d'entrée.</p></div>`,
+                questions: [
+                    { q: "Que signifie un pare-feu 'Stateful' ?", options: ["Il garde la trace des connexions actives", "Il filtre par mot de passe", "Il est hébergé dans le cloud"], correct: 0, hint: "Il gère l'état (State) des flux." },
+                    { q: "Quelle est la règle de bonne pratique par défaut pour le trafic entrant ?", options: ["Tout autoriser", "Tout bloquer (Drop)", "Autoriser uniquement le port 80"], correct: 1, hint: "Principe du moindre privilège." }
+                ]
+            },
+            'sec-vpn': {
+                course: `<div class="prose"><h3>Concepts VPN</h3><p>Réseau Privé Virtuel. Créé un tunnel chiffré sur Internet.</p><ul><li><strong>Client-to-Site :</strong> Un télétravailleur se connecte à l'entreprise (OpenVPN, Wireguard).</li><li><strong>Site-to-Site :</strong> Relie deux agences d'une même entreprise de façon transparente (souvent IPsec).</li></ul></div>`,
+                questions: [
+                    { q: "Quel type de VPN relie 2 routeurs de 2 villes différentes de façon permanente ?", options: ["Client-to-Site", "Site-to-Site", "Proxy"], correct: 1, hint: "De site à site." },
+                    { q: "Quel protocole est la référence absolue pour du VPN Site-to-Site sécurisé ?", options: ["PPTP", "IPsec", "Telnet"], correct: 1, hint: "Internet Protocol Security." }
+                ]
+            }
+        };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        let currentModuleId = null;
+        let currentQuizData = null;
+        let currentQuestionIndex = 0;
+        let scoreQuiz = { correct: 0, wrong: 0 };
+        let rewardPotential = 0;
+        let questionAnswered = false;
+
+        function initApp() { updateDashboard(); renderChapters(); }
+
+        function updateDashboard() {
+            // Met à jour l'écran principal
+            document.getElementById('score-display').innerText = state.points;
+            
+            // NOUVEAU : Met à jour les points dans la fenêtre du quiz en temps réel
+            const modalScore = document.getElementById('modal-score-display');
+            if (modalScore) modalScore.innerText = state.points;
+
+            const total = state.stats.correct + state.stats.wrong;
+            const accuracy = total === 0 ? 0 : Math.round((state.stats.correct / total) * 100);
+            document.getElementById('stats-display').innerText = `${accuracy}%`;
+            const compCount = Object.keys(state.completions).length;
+            const progPct = Math.round((compCount / modules.length) * 100);
+            document.getElementById('progress-bar').style.width = `${progPct}%`;
+            document.getElementById('progress-text').innerText = `${progPct}%`;
+        }
+
+        function renderChapters() {
+            const container = document.getElementById('chapters-container');
+            container.innerHTML = chapters.map(chap => {
+                const chapMods = modules.filter(m => m.chapId === chap.id);
+                return `
+                    <section>
+                        <h3 class="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">${chap.title}</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            ${chapMods.map(m => renderModuleCard(m)).join('')}
+                        </div>
+                    </section>
+                `;
+            }).join('');
+        }
+
+        function renderModuleCard(m) {
+            const isUnlocked = state.unlocked.includes(m.id);
+            const timesComp = state.completions[m.id] || 0;
+            const bestScore = state.moduleScores[m.id] !== undefined ? state.moduleScores[m.id] : 0;
+            const hasData = quizDatabase[m.id]; 
+            
+            // 1. État Bloqué (Grisé)
+            if (!isUnlocked) {
+                const canAfford = state.points >= m.price;
+                return `
+                    <div class="border border-slate-300 rounded-xl p-4 bg-slate-200/60 flex flex-col justify-between h-32 locked module-card">
+                        <h4 class="font-semibold text-slate-500 text-sm">${m.title}</h4>
+                        <button onclick="unlockModule('${m.id}', ${m.price})" class="w-full py-1.5 rounded font-bold text-xs mt-2 shadow-sm ${canAfford ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-slate-300 text-slate-500 cursor-not-allowed'}" ${!canAfford ? 'disabled' : ''}>
+                            Débloquer (-${m.price} pts)
+                        </button>
+                    </div>`;
+            }
+
+            // Styles dynamiques selon la réussite pour le fond de la carte
+            let bgClass = 'bg-white border-slate-200 border-l-4 border-l-slate-300';
+            let statusBadge = '<div class="h-4"></div>';
+
+            if (timesComp > 0) {
+                if (bestScore >= 70) {
+                    bgClass = 'bg-emerald-50 border-emerald-200 border-l-4 border-l-emerald-500';
+                    statusBadge = `<div class="flex justify-end"><span class="text-[9px] bg-emerald-100 text-emerald-700 px-1.5 rounded-full font-bold">Excellent (${bestScore}%)</span></div>`;
+                } else {
+                    bgClass = 'bg-orange-50 border-orange-200 border-l-4 border-l-orange-500';
+                    statusBadge = `<div class="flex justify-end"><span class="text-[9px] bg-orange-100 text-orange-700 px-1.5 rounded-full font-bold">À revoir (${bestScore}%)</span></div>`;
+                }
+            }
+
+            const reward = timesComp === 0 ? 30 : 5; 
+            return `
+                <div class="border rounded-xl p-4 flex flex-col justify-between h-32 module-card ${bgClass}">
+                    <div>
+                        ${statusBadge}
+                        <h4 class="font-bold text-slate-900 text-sm mt-1">${m.title}</h4>
+                    </div>
+                    <button onclick="startModule('${m.id}', '${m.title.replace(/'/g, "\\'")}', ${reward})" class="w-full py-1.5 rounded font-bold text-xs mt-2 shadow-sm ${hasData ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-slate-300 text-slate-500 cursor-not-allowed'}" ${!hasData ? 'disabled' : ''}>
+                        ${hasData ? (timesComp > 0 ? `Refaire (+${reward} pts)` : `Lancer (+${reward} pts)`) : 'En construction'}
+                    </button>
+                </div>`;
+        }
+
+        function unlockModule(id, price) {
+            if (state.points >= price) {
+                state.points -= price;
+                state.unlocked.push(id);
+                saveAndRefresh();
+                showToast(`Module débloqué ! (-${price} pts)`, 'success');
+            }
+        }
+
+        function startModule(id, title, pts) {
+            currentModuleId = id;
+            currentQuizData = quizDatabase[id];
+            currentQuestionIndex = 0;
+            scoreQuiz = { correct: 0, wrong: 0 };
+            rewardPotential = pts;
+
+            document.getElementById('quiz-title').innerText = title;
+            document.getElementById('quiz-modal').classList.remove('hidden');
+            
+            const content = document.getElementById('quiz-content');
+            content.innerHTML = `
+                <div class="mb-4"><span class="text-xs font-bold text-blue-500 uppercase">Flash-Cours</span></div>
+                <div class="bg-blue-50/50 p-6 rounded-xl border border-blue-100">${currentQuizData.course}</div>
+                <div class="mt-6 text-right">
+                    <button onclick="renderQuestion()" class="bg-slate-800 hover:bg-slate-900 text-white font-medium py-2.5 px-6 rounded-lg">Passer aux questions →</button>
+                </div>
+            `;
+        }
+
+        function renderQuestion() {
+            if (currentQuestionIndex >= currentQuizData.questions.length) return finishQuiz();
+            questionAnswered = false;
+            
+            const q = currentQuizData.questions[currentQuestionIndex];
+            let optionsHtml = q.options.map((opt, i) => `
+                <button id="opt-${i}" onclick="handleAnswer(${i})" class="opt-btn w-full text-left p-4 rounded-lg border border-slate-200 hover:border-blue-500 hover:bg-blue-50 font-medium text-slate-700 mb-3">
+                    ${opt}
+                </button>
+            `).join('');
+
+            document.getElementById('quiz-content').innerHTML = `
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <span class="text-xs font-bold text-slate-400 uppercase">Question ${currentQuestionIndex + 1} / ${currentQuizData.questions.length}</span>
+                        <h4 class="text-lg font-semibold text-slate-900 mt-2">${q.q}</h4>
+                    </div>
+                    <button onclick="buyHint()" id="hint-btn" class="text-xs bg-amber-100 text-amber-700 font-bold px-3 py-1.5 rounded hover:bg-amber-200">-5 pts = Indice</button>
+                </div>
+                
+                <div id="hint-box" class="hidden mb-4 p-3 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg">
+                    <strong>💡 Indice : </strong> <span>${q.hint}</span>
+                </div>
+
+                <div id="options-container">${optionsHtml}</div>
+                
+                <div id="next-container" class="hidden mt-6 text-right">
+                    <button onclick="nextQuestion()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg">Question suivante →</button>
+                </div>
+            `;
+        }
+
+        function buyHint() {
+            if(questionAnswered) return;
+            if (state.points >= 5) {
+                state.points -= 5;
+                updateDashboard();
+                saveOnly();
+                document.getElementById('hint-btn').classList.add('hidden');
+                document.getElementById('hint-box').classList.remove('hidden');
+                showToast('Indice révélé (-5 pts)', 'info');
+            } else {
+                showToast('Points insuffisants !', 'error');
+            }
+        }
+
+        function handleAnswer(selectedIndex) {
+            if(questionAnswered) return;
+            questionAnswered = true;
+            document.getElementById('hint-btn').classList.add('hidden'); 
+
+            const q = currentQuizData.questions[currentQuestionIndex];
+            const isCorrect = (selectedIndex === q.correct);
+            
+            if (isCorrect) scoreQuiz.correct++;
+            else scoreQuiz.wrong++;
+
+            q.options.forEach((opt, i) => {
+                const btn = document.getElementById(`opt-${i}`);
+                btn.classList.add('opt-disabled');
+                btn.onclick = null; 
+                if (i === q.correct) btn.classList.add('opt-correct');
+                else if (i === selectedIndex && !isCorrect) btn.classList.add('opt-wrong');
+            });
+
+            document.getElementById('next-container').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            renderQuestion();
+        }
+
+        function finishQuiz() {
+            const totalQ = currentQuizData.questions.length;
+            const earnedPts = Math.round(rewardPotential * (scoreQuiz.correct / totalQ));
+            const scorePct = Math.round((scoreQuiz.correct / totalQ) * 100);
+            
+            state.points += earnedPts;
+            state.stats.correct += scoreQuiz.correct;
+            state.stats.wrong += scoreQuiz.wrong;
+            state.completions[currentModuleId] = (state.completions[currentModuleId] || 0) + 1;
+            
+            state.moduleScores[currentModuleId] = Math.max(state.moduleScores[currentModuleId] || 0, scorePct);
+
+            saveAndRefresh();
+
+            const isGood = scorePct >= 70;
+            const mod = modules.find(m => m.id === currentModuleId);
+
+            document.getElementById('quiz-content').innerHTML = `
+                <div class="text-center py-8">
+                    <h4 class="text-2xl font-bold ${isGood ? 'text-emerald-600' : 'text-orange-500'} mb-2">
+                        ${isGood ? 'Bien joué !' : 'À revoir !'}
+                    </h4>
+                    <p class="text-slate-600 mb-6">Score : ${scorePct}% (${scoreQuiz.correct}/${totalQ})</p>
+                    <div class="inline-block bg-emerald-50 text-emerald-700 px-6 py-3 rounded-xl border border-emerald-200 font-bold text-lg mb-8">
+                        Gains : + ${earnedPts} pts
+                    </div>
+                    <div class="flex justify-center gap-3">
+                        <button onclick="startModule('${currentModuleId}', '${mod.title.replace(/'/g, "\\'")}', 5)" class="bg-blue-100 hover:bg-blue-200 text-blue-800 font-medium py-2 px-6 rounded-lg transition-colors">Recommencer (+5 pts)</button>
+                        <button onclick="closeQuizModal()" class="bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 px-6 rounded-lg transition-colors">Terminer</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function closeQuizModal() { document.getElementById('quiz-modal').classList.add('hidden'); }
+
+        function saveAndRefresh() { localStorage.setItem('tssr_v11', JSON.stringify(state)); initApp(); }
+        function saveOnly() { localStorage.setItem('tssr_v11', JSON.stringify(state)); }
+
+        function showToast(msg, type) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            let color = 'bg-blue-600';
+            if(type === 'success') color = 'bg-emerald-500';
+            if(type === 'error') color = 'bg-red-500';
+            
+            toast.className = `toast-enter ${color} text-white px-4 py-2 rounded-lg shadow-lg font-medium text-sm`;
+            toast.innerHTML = msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.replace('toast-enter', 'toast-exit');
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+
+        function requestReset() { document.getElementById('confirm-modal').classList.remove('hidden'); }
+        function closeConfirmModal() { document.getElementById('confirm-modal').classList.add('hidden'); }
+        function executeReset() { state = JSON.parse(JSON.stringify(defaultState)); saveAndRefresh(); closeConfirmModal(); }
+
+        initApp();
+    </script>
+</body>
+</html>
