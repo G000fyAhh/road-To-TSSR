@@ -105,8 +105,9 @@
     <div id="toast-container" class="fixed bottom-6 right-6 z-[80] flex flex-col gap-3"></div>
 
     <script>
-        const defaultState = { points: 50, unlocked: [], completions: {}, moduleScores: {}, stats: { correct: 0, wrong: 0 } };
+        const defaultState = { points: 50, indiceCost: 10, unlocked: [], completions: {}, moduleScores: {}, stats: { correct: 0, wrong: 0 } };
         let state = JSON.parse(localStorage.getItem('tssr_v11')) || defaultState;
+
 
         const chapters = [
             { id: 'net', title: 'Infrastructures Réseaux' },
@@ -552,7 +553,7 @@
                         <span class="text-xs font-bold text-slate-400 uppercase">Question ${currentQuestionIndex + 1} / ${currentQuizData.questions.length}</span>
                         <h4 class="text-lg font-semibold text-slate-900 mt-2">${q.q}</h4>
                     </div>
-                    <button onclick="buyHint()" id="hint-btn" class="text-xs bg-amber-100 text-amber-700 font-bold px-3 py-1.5 rounded hover:bg-amber-200">-5 pts = Indice</button>
+                    <button onclick="buyHint()" id="hint-btn" class="text-xs bg-amber-100 text-amber-700 font-bold px-3 py-1.5 rounded hover:bg-amber-200">Indice(' + state.indiceCost + ')</button>
                 </div>
                 
                 <div id="hint-box" class="hidden mb-4 p-3 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg">
@@ -569,8 +570,8 @@
 
         function buyHint() {
             if(questionAnswered) return;
-            if (state.points >= 5) {
-                state.points -= 5;
+            if (state.points >= state.indiceCost) {
+                state.points -= state.indiceCost;
                 updateDashboard();
                 saveOnly();
                 document.getElementById('hint-btn').classList.add('hidden');
