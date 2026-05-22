@@ -112,202 +112,296 @@
             { id: 'net', title: 'Infrastructures Réseaux' },
             { id: 'lin', title: 'Administration Linux' },
             { id: 'win', title: 'Écosystème Windows Server' },
-            { id: 'virt', title: 'Virtualisation & Sécurité' }
+            { id: 'virt', title: 'Virtualisation & Sécurité' },
+            { id: 'diag', title: 'Support & Diagnostic IT' } // <-- NOUVEAU CHAPITRE
         ];
 
         const modules = [
-            { id: 'osi', chapId: 'net', title: 'Modèle OSI & TCP/IP', price: 10 },
-            { id: 'ipv4', chapId: 'net', title: 'Adressage IPv4', price: 15 },
-            { id: 'ipv6', chapId: 'net', title: 'Introduction IPv6', price: 15 },
-            { id: 'vlan', chapId: 'net', title: 'Concepts VLANs', price: 20 },
-            { id: 'cisco', chapId: 'net', title: 'CLI Cisco de base', price: 25 },
+            // Réseaux
+            { id: 'osi', chapId: 'net', title: 'Modèle OSI & Encapsulation', price: 10 },
+            { id: 'ipv4', chapId: 'net', title: 'Adressage IPv4 & Routage', price: 15 },
+            { id: 'ipv6', chapId: 'net', title: 'IPv6 Avancé', price: 15 },
+            { id: 'vlan', chapId: 'net', title: 'Switching & VLANs', price: 20 },
+            { id: 'cisco', chapId: 'net', title: 'Administration Cisco', price: 25 },
             { id: 'dhcp-dns', chapId: 'net', title: 'DHCP & DNS', price: 20 },
-            { id: 'lin-cmd', chapId: 'lin', title: 'Nav. & Fichiers', price: 10 },
-            { id: 'lin-perm', chapId: 'lin', title: 'Droits (chmod/chown)', price: 15 },
-            { id: 'lin-srv', chapId: 'lin', title: 'Services (systemctl)', price: 20 },
-            { id: 'lin-apt', chapId: 'lin', title: 'Paquets (APT)', price: 15 },
-            { id: 'lin-lvm', chapId: 'lin', title: 'Stockage LVM', price: 25 },
-            { id: 'lin-bash', chapId: 'lin', title: 'Bases Bash', price: 25 },
-            { id: 'win-ad', chapId: 'win', title: 'Concepts AD DS', price: 15 },
-            { id: 'win-gpo', chapId: 'win', title: 'Stratégies (GPO)', price: 20 },
+            // Linux
+            { id: 'lin-cmd', chapId: 'lin', title: 'CLI & Flux', price: 10 },
+            { id: 'lin-perm', chapId: 'lin', title: 'Droits & Sécurité OS', price: 15 },
+            { id: 'lin-net', chapId: 'lin', title: 'Config Réseau Linux', price: 20 },
+            { id: 'lin-srv', chapId: 'lin', title: 'Systemd & Logs', price: 20 },
+            { id: 'lin-apt', chapId: 'lin', title: 'Gestion de Paquets', price: 15 },
+            { id: 'lin-lvm', chapId: 'lin', title: 'Stockage LVM & FS', price: 25 },
+            { id: 'lin-bash', chapId: 'lin', title: 'Scripting Bash', price: 25 },
+            // Windows
+            { id: 'win-ad', chapId: 'win', title: 'Active Directory Avancé', price: 15 },
+            { id: 'win-gpo', chapId: 'win', title: 'Stratégies de Groupe (GPO)', price: 20 },
             { id: 'win-wds', chapId: 'win', title: 'Déploiement WDS', price: 20 },
             { id: 'win-mdt', chapId: 'win', title: 'Automatisation MDT', price: 25 },
-            { id: 'win-ps', chapId: 'win', title: 'Bases PowerShell', price: 25 },
-            { id: 'win-fs', chapId: 'win', title: 'Droits NTFS', price: 15 },
-            { id: 'virt-prox', chapId: 'virt', title: 'Hyperviseurs & Proxmox', price: 20 },
-            { id: 'virt-cont', chapId: 'virt', title: 'Concepts Conteneurs', price: 20 },
-            { id: 'sec-fw', chapId: 'virt', title: 'Pare-feu & Iptables', price: 20 },
-            { id: 'sec-vpn', chapId: 'virt', title: 'Concepts VPN', price: 25 }
+            { id: 'win-ps', chapId: 'win', title: 'Scripting PowerShell', price: 25 },
+            { id: 'win-fs', chapId: 'win', title: 'Partages & Droits NTFS', price: 15 },
+            // Virtualisation
+            { id: 'virt-prox', chapId: 'virt', title: 'Proxmox & Hyperviseurs', price: 20 },
+            { id: 'virt-cont', chapId: 'virt', title: 'Docker & Conteneurs', price: 20 },
+            { id: 'sec-fw', chapId: 'virt', title: 'Filtrage & Pare-feu', price: 20 },
+            { id: 'sec-vpn', chapId: 'virt', title: 'Cryptographie & VPN', price: 25 },
+            // Diagnostic
+            { id: 'diag-net', chapId: 'diag', title: 'Troubleshooting Réseau', price: 30 },
+            { id: 'diag-os', chapId: 'diag', title: 'Troubleshooting OS', price: 30 },
+            { id: 'diag-itil', chapId: 'diag', title: 'Méthodologie & ITIL', price: 20 }
         ];
 
 
-
-
-
-
-
-
-
         const quizDatabase = {
-            // --- RESEAU ---
-            'osi': {
-                course: `<div class="prose"><h3>Le Modèle OSI</h3><p>Standard de communication réseau en 7 couches.</p><ul><li><strong>L7 Application:</strong> HTTP, FTP.</li><li><strong>L4 Transport:</strong> TCP (fiable) / UDP (rapide). PDU: Segment.</li><li><strong>L3 Réseau:</strong> Adressage IP, Routage. PDU: Paquet.</li><li><strong>L2 Liaison:</strong> Adressage MAC, Switch. PDU: Trame.</li></ul></div>`,
+            // ==========================================
+            // CHAPITRE : SUPPORT & DIAGNOSTIC
+            // ==========================================
+            'diag-net': {
+                course: `<div class="prose"><h3>Méthodologie Réseau</h3><p>Toujours vérifier la couche 1 (physique) avant la couche 3 (routage).</p><ul><li><strong>Ping :</strong> Vérifie la connectivité IP (ICMP).</li><li><strong>Traceroute / Tracert :</strong> Identifie où le paquet se perd.</li><li><strong>Nslookup / Dig :</strong> Isole les problèmes de résolution de noms.</li><li><strong>Wireshark / tcpdump :</strong> Capture les trames pour voir ce qui transite réellement.</li></ul></div>`,
                 questions: [
-                    { q: "Quelle couche gère le routage des paquets IP ?", options: ["Couche 2 (Liaison)", "Couche 3 (Réseau)", "Couche 4 (Transport)"], correct: 1, hint: "C'est la couche où travaillent les routeurs." },
-                    { q: "Quel protocole de la couche 4 garantit la livraison des données ?", options: ["TCP", "UDP", "IP"], correct: 0, hint: "Il fonctionne en mode connecté." }
+                    { q: "Un PC (192.168.1.10) ne va pas sur Internet. Il ping sa passerelle (192.168.1.254) et ping 8.8.8.8, mais 'ping google.fr' échoue. Le problème vient de :", options: ["La table de routage du routeur", "Le serveur DHCP qui n'a pas donné d'IP", "Le serveur DNS configuré sur le PC", "Un câble réseau défectueux"], correct: 2, hint: "Si l'IP publique répond, le routage est bon. C'est la résolution de nom qui bloque." },
+                    { q: "Deux PC reliés au même switch ne parviennent pas à communiquer. Leurs IP sont 10.0.0.5/24 et 10.0.0.6/24. Quel est le test le plus pertinent ?", options: ["Faire un 'arp -a' pour voir si la MAC de l'autre est apprise", "Faire un traceroute", "Vérifier la passerelle par défaut", "Redémarrer le routeur"], correct: 0, hint: "Sur un même réseau local (LAN), la communication se fait en Couche 2 (MAC), sans passer par le routeur." },
+                    { q: "Quel problème classique provoque une 'tempête de broadcast' faisant s'effondrer un réseau ?", options: ["Une attaque DDoS venant d'Internet", "Une boucle réseau physique (sans Spanning Tree)", "Un serveur DHCP en panne", "Un conflit d'adresse IP"], correct: 1, hint: "Quand un paquet tourne en rond à l'infini entre plusieurs switches." },
+                    { q: "Lors d'un 'tracert', la 3ème ligne affiche des '* * * Délai d\'attente dépassé'. Que cela signifie-t-il ?", options: ["La destination finale est éteinte", "Le câble est coupé", "Le routeur de ce saut bloque le protocole ICMP", "Le serveur DNS est introuvable"], correct: 2, hint: "Certains routeurs refusent de répondre aux requêtes de test pour des raisons de sécurité." }
+                ]
+            },
+            'diag-os': {
+                course: `<div class="prose"><h3>Troubleshooting OS</h3><p>Sur Windows : <strong>Observateur d'événements (Event Viewer)</strong> (Système, Application, Sécurité). BSOD = Écran bleu (souvent matériel ou pilote).</p><p>Sur Linux : Logs dans <code>/var/log/</code> (syslog, auth.log). Commande <code>dmesg</code> pour les erreurs matérielles du noyau (Kernel).</p></div>`,
+                questions: [
+                    { q: "Un utilisateur se plaint qu'une application métier crash aléatoirement sous Windows. Que regardez-vous en premier ?", options: ["Le gestionnaire des tâches", "L'Observateur d'événements (Journaux Windows > Application)", "La base de registre", "L'invite de commande"], correct: 1, hint: "C'est là que Windows note tous les plantages et codes d'erreur." },
+                    { q: "Un serveur Linux refuse de démarrer correctement et affiche 'Kernel Panic'. D'où cela peut-il provenir ?", options: ["Le serveur SSH est arrêté", "Le pare-feu bloque le démarrage", "Un problème de montage du disque principal (/etc/fstab) ou du noyau", "Un mot de passe root expiré"], correct: 2, hint: "Le noyau (Kernel) ne trouve pas ce dont il a besoin pour lancer l'OS de base." },
+                    { q: "Sous Windows Server, un utilisateur verrouille son compte sans arrêt. Quel journal permet d'identifier la machine source du problème ?", options: ["Journal Système", "Journal de Sécurité (Audit des ouvertures de session)", "Journal d'Application", "Journal Setup"], correct: 1, hint: "Tout ce qui touche à l'authentification et aux droits s'y trouve." },
+                    { q: "Sous Linux, quelle commande permet de voir en temps réel la consommation CPU/RAM des processus pour trouver celui qui fige le serveur ?", options: ["ls", "grep", "top ou htop", "df -h"], correct: 2, hint: "C'est l'équivalent du gestionnaire des tâches." }
+                ]
+            },
+            'diag-itil': {
+                course: `<div class="prose"><h3>Méthodologie & ITIL</h3><p>ITIL (Information Technology Infrastructure Library) est le standard des bonnes pratiques IT.</p><ul><li><strong>Incident :</strong> Interruption non planifiée d'un service.</li><li><strong>Problème :</strong> Cause racine d'un ou plusieurs incidents.</li><li><strong>SLA :</strong> Service Level Agreement (Garantie de temps de rétablissement/réponse).</li></ul></div>`,
+                questions: [
+                    { q: "Selon ITIL, quelle est la différence entre un Incident et un Problème ?", options: ["Un incident est grave, un problème est mineur", "L'incident est l'interruption, le problème est la cause sous-jacente", "Un problème est causé par un utilisateur, un incident par le matériel"], correct: 1, hint: "On résout l'incident rapidement (ex: redémarrer le service), puis on cherche le problème (ex: pourquoi le service a planté)." },
+                    { q: "Un utilisateur signale que son PC ne s'allume pas du tout. En demandant des détails, il dit que l'écran affiche 'No Signal'. Quel est le vrai diagnostic ?", options: ["Le PC est mort", "Le câble vidéo ou l'écran a un souci, le PC tourne peut-être", "L'alimentation de l'immeuble est coupée"], correct: 1, hint: "Ne jamais se fier uniquement au premier diagnostic de l'utilisateur." },
+                    { q: "Que signifie la notion de GTR dans un contrat SLA ?", options: ["Garantie de Temps de Rétablissement (Résolution maximum)", "Gestion Totale du Réseau", "Garantie de Temps de Réponse (Prise en compte maximum)"], correct: 0, hint: "Si la GTR est de 4h, le service doit refonctionner avant 4h." }
+                ]
+            },
+
+            // ==========================================
+            // CHAPITRE : RÉSEAUX
+            // ==========================================
+            'osi': {
+                course: `<div class="prose"><h3>Le Modèle OSI</h3><p>7 couches. PDU (Protocol Data Unit) :</p><ul><li><strong>L4 Transport :</strong> Segment. Protocoles : TCP, UDP, Ports (Ex: 80, 443).</li><li><strong>L3 Réseau :</strong> Paquet. Protocole : IP, ICMP. Équipement : Routeur.</li><li><strong>L2 Liaison :</strong> Trame. Adressage MAC. Équipement : Switch.</li></ul></div>`,
+                questions: [
+                    { q: "Un switch de niveau 2 peut-il bloquer le trafic vers l'adresse IP 8.8.8.8 ?", options: ["Oui, grâce aux VLANs", "Non, un switch L2 ne lit pas les adresses IP (Couche 3)", "Oui, avec un pare-feu intégré"], correct: 1, hint: "Il s'arrête à l'adresse MAC." },
+                    { q: "À quelle couche du modèle OSI se situe le processus d'encapsulation où l'on ajoute le port source et destination ?", options: ["Couche 2 (Liaison)", "Couche 3 (Réseau)", "Couche 4 (Transport)", "Couche 7 (Application)"], correct: 2, hint: "Les ports définissent le transport des données." },
+                    { q: "Le protocole HTTPS fonctionne à la couche Application (7), mais il s'appuie sur un protocole de la couche Transport pour garantir l'arrivée des données. Lequel ?", options: ["UDP", "IP", "TCP", "MAC"], correct: 2, hint: "Il a besoin d'une connexion fiable avec accusé de réception." },
+                    { q: "Quel est le PDU (Protocol Data Unit) de la couche 3 (Réseau) ?", options: ["La Trame", "Le Paquet", "Le Segment", "La Donnée"], correct: 1, hint: "Un routeur route des..." }
                 ]
             },
             'ipv4': {
-                course: `<div class="prose"><h3>Adressage IPv4</h3><p>Une IPv4 = 32 bits (4 octets). Le <strong>Masque de sous-réseau</strong> sépare la partie Réseau de la partie Hôte.</p><p>Adresses privées : <code>10.0.0.0/8</code>, <code>172.16.0.0/12</code>, <code>192.168.0.0/16</code>.</p></div>`,
+                course: `<div class="prose"><h3>Routage & Sous-réseaux (Subnetting)</h3><p>Un masque /24 = 255.255.255.0 = 254 hôtes utilisables.<br><strong>IP Réseau :</strong> Tous les bits hôtes à 0.<br><strong>IP Broadcast :</strong> Tous les bits hôtes à 1.</p></div>`,
                 questions: [
-                    { q: "Quel est le masque décimal pour un CIDR /24 ?", options: ["255.0.0.0", "255.255.0.0", "255.255.255.0"], correct: 2, hint: "Cela représente 24 bits à 1." },
-                    { q: "Laquelle de ces adresses est une IP privée ?", options: ["8.8.8.8", "192.168.1.50", "17.253.144.10"], correct: 1, hint: "Regarde la classe C définie dans la RFC 1918." }
+                    { q: "Dans le sous-réseau 192.168.10.0/24, quelle est l'adresse de diffusion (Broadcast) ?", options: ["192.168.10.1", "192.168.10.254", "192.168.10.255"], correct: 2, hint: "C'est la dernière adresse possible du bloc." },
+                    { q: "Un PC est configuré en DHCP mais n'arrive pas à joindre le serveur. Il obtient l'adresse 169.254.10.5. Qu'est-ce que cela signifie ?", options: ["C'est une adresse publique", "C'est une adresse APIPA (auto-assignée car DHCP injoignable)", "Le routeur est mal configuré"], correct: 1, hint: "Windows s'attribue cette adresse en dernier recours." },
+                    { q: "Combien d'adresses utilisables pour les machines y a-t-il dans un sous-réseau /26 ?", options: ["254", "126", "62", "30"], correct: 2, hint: "2^(32-26) - 2 adresses réservées (Réseau et Broadcast)." },
+                    { q: "Quelle technologie permet à plusieurs PC d'un réseau privé d'accéder à Internet en partageant une seule adresse IP publique ?", options: ["Le VLAN", "Le NAT / PAT", "Le Spanning Tree", "Le DHCP"], correct: 1, hint: "Network Address Translation." }
                 ]
             },
             'ipv6': {
-                course: `<div class="prose"><h3>IPv6 en bref</h3><p>Codé sur <strong>128 bits</strong> en hexadécimal (ex: <code>fe80::1</code>).</p><ul><li><strong>Link-local (FE80::/10):</strong> Valable uniquement sur le réseau local (comme APIPA).</li><li><strong>Global Unicast (2000::/3):</strong> Routable sur Internet public.</li></ul></div>`,
+                course: `<div class="prose"><h3>IPv6 Avancé</h3><p>Fin de l'épuisement des adresses. Plus de NAT obligatoire, plus de Broadcast (remplacé par Multicast).</p><ul><li><strong>SLAAC :</strong> Auto-configuration sans serveur DHCPv6.</li><li><strong>Loopback :</strong> <code>::1</code> (équivalent 127.0.0.1).</li></ul></div>`,
                 questions: [
-                    { q: "Combien de bits comporte une adresse IPv6 ?", options: ["32 bits", "64 bits", "128 bits"], correct: 2, hint: "C'est 4 fois plus long qu'une IPv4." },
-                    { q: "Quel préfixe correspond à une adresse 'Link-Local' ?", options: ["FE80::", "2001::", "FC00::"], correct: 0, hint: "Commence par FE..." }
+                    { q: "En IPv6, comment une machine peut-elle configurer son IP toute seule sans serveur DHCP ?", options: ["Via le protocole SLAAC et les annonces du routeur (NDP)", "Elle utilise l'APIPA obligatoirement", "Elle invente une adresse aléatoire"], correct: 0, hint: "Stateless Address Autoconfiguration." },
+                    { q: "L'adresse IPv6 '::1' correspond à quoi en IPv4 ?", options: ["192.168.1.1 (Passerelle)", "255.255.255.255 (Broadcast)", "127.0.0.1 (Loopback / Localhost)"], correct: 2, hint: "C'est la boucle locale." },
+                    { q: "Vrai ou Faux : En IPv6, le Broadcast n'existe plus.", options: ["Vrai (remplacé par le Multicast/Anycast)", "Faux"], correct: 0, hint: "L'envoi massif à tous a été supprimé pour plus d'efficacité." },
+                    { q: "Quelle est la taille de l'en-tête (Header) de base d'un paquet IPv6 comparé à l'IPv4 ?", options: ["Plus petit et variable", "Plus grand (40 octets) mais fixe et simplifié", "Identique"], correct: 1, hint: "Conçu pour être traité plus vite par les routeurs matériels." }
                 ]
             },
             'vlan': {
-                course: `<div class="prose"><h3>Les VLANs</h3><p>Un VLAN (Virtual LAN) sépare logiquement un réseau physique en plusieurs domaines de diffusion distincts.</p><p>Norme d'encapsulation : <strong>802.1Q</strong> (ajoute un tag).<br>Port <strong>Access</strong> = 1 seul VLAN. Port <strong>Trunk</strong> = Plusieurs VLANs.</p></div>`,
+                course: `<div class="prose"><h3>VLANs & Spanning Tree</h3><p><strong>802.1Q (Trunk) :</strong> Ajoute un tag de 4 octets à la trame Ethernet pour identifier le VLAN.<br><strong>VLAN Natif :</strong> Le seul VLAN qui circule sur un Trunk sans aucun tag.<br><strong>Spanning Tree (STP) :</strong> Désactive les ports redondants pour éviter les boucles L2.</p></div>`,
                 questions: [
-                    { q: "Quel est le but principal d'un VLAN ?", options: ["Augmenter le débit", "Segmenter logiquement le réseau", "Remplacer le routage"], correct: 1, hint: "Pense 'isolation'." },
-                    { q: "Quel standard IEEE gère le tagging des VLANs sur un port Trunk ?", options: ["802.11", "802.1X", "802.1Q"], correct: 2, hint: "La lettre magique est Q." }
+                    { q: "Que se passe-t-il si un switch reçoit une trame non-tagguée sur un port configuré en Trunk ?", options: ["Il la supprime", "Il l'envoie dans tous les VLANs", "Il l'assigne au VLAN Natif"], correct: 2, hint: "C'est le rôle de ce VLAN spécifique." },
+                    { q: "Le protocole Spanning Tree (STP) bloque certains liens. Pourquoi ?", options: ["Pour économiser de l'énergie", "Pour éviter les boucles (loops) de diffusion en Couche 2", "Pour bloquer les pirates"], correct: 1, hint: "Les trames n'ont pas de 'Time To Live' (TTL), une boucle est donc fatale." },
+                    { q: "Sur un switch, qu'est-ce qu'un port 'Access' ?", options: ["Un port qui appartient à un seul VLAN et retire le tag sortant", "Un port qui relie deux switchs entre eux", "Un port réservé à l'administrateur"], correct: 0, hint: "Le PC branché dessus ne sait même pas qu'il est dans un VLAN." },
+                    { q: "Qu'est-ce que le routage Inter-VLAN (ou Router-on-a-Stick) ?", options: ["Relier les switchs en wifi", "Utiliser un routeur avec des sous-interfaces pour faire communiquer 2 VLANs distincts", "Désactiver les VLANs"], correct: 1, hint: "Les VLANs isolent par nature, il faut remonter en Couche 3 pour les faire se parler." }
                 ]
             },
             'cisco': {
-                course: `<div class="prose"><h3>CLI Cisco</h3><ul><li><code>></code> Mode Utilisateur</li><li><code>#</code> Mode Privilégié (via <code>enable</code>)</li><li><code>(config)#</code> Mode Configuration (via <code>configure terminal</code>)</li></ul><p>Sauvegarde : <code>copy running-config startup-config</code>.</p></div>`,
+                course: `<div class="prose"><h3>Administration Cisco</h3><p><code>show ip interface brief</code> : Statut rapide des ports.<br><code>show running-config</code> : Config active (en RAM).<br><code>show startup-config</code> : Config sauvegardée (en NVRAM).<br>Mots de passe : <code>enable secret</code> est chiffré, <code>enable password</code> est en clair.</p></div>`,
                 questions: [
-                    { q: "Quelle commande permet de passer du mode Utilisateur au mode Privilégié ?", options: ["configure terminal", "enable", "admin"], correct: 1, hint: "En français : 'activer'." },
-                    { q: "Comment sauvegarde-t-on la configuration active ?", options: ["copy running-config startup-config", "save all", "write memory-config"], correct: 0, hint: "On copie ce qui 'tourne' vers le 'démarrage'." }
+                    { q: "Un routeur redémarre et perd toute votre configuration de la matinée. Que s'est-il passé ?", options: ["Le routeur est défectueux", "Vous avez oublié de faire un 'copy running-config startup-config'", "Le câble console était débranché"], correct: 1, hint: "La configuration n'était qu'en mémoire vive (RAM)." },
+                    { q: "Quelle commande permet de désactiver (éteindre) administrativement l'interface Gigabit0/1 ?", options: ["stop interface", "shutdown", "disable"], correct: 1, hint: "Pour l'allumer, on utilise l'inverse : 'no ...'." },
+                    { q: "Quel protocole Cisco (propriétaire) permet de découvrir les équipements réseau directement connectés ?", options: ["LLDP", "ARP", "CDP (Cisco Discovery Protocol)"], correct: 2, hint: "L'équivalent standard ouvert est LLDP." },
+                    { q: "Comment sécuriser l'accès privilégié (enable) avec un mot de passe fortement chiffré (MD5/SHA) ?", options: ["enable password Mdp", "enable secret Mdp", "secure password Mdp"], correct: 1, hint: "Le terme 'secret' invoque le hachage par défaut." }
                 ]
             },
             'dhcp-dns': {
-                course: `<div class="prose"><h3>DHCP & DNS</h3><p><strong>DHCP :</strong> Distribue les IP. Séquence <strong>DORA</strong> (Discover, Offer, Request, Acknowledge).</p><p><strong>DNS :</strong> Résout les noms en IP. Enregistrement <code>A</code> = Nom vers IPv4. <code>CNAME</code> = Alias.</p></div>`,
+                course: `<div class="prose"><h3>Services Réseaux</h3><p><strong>DHCP Relay (ip helper-address) :</strong> Permet à des requêtes DHCP (Broadcast) de traverser un routeur pour atteindre un serveur DHCP distant.<br><strong>DNS :</strong> Record 'A' (IPv4), 'AAAA' (IPv6), 'MX' (Serveur Mail), 'TXT' (Validation domaine/SPF).</p></div>`,
                 questions: [
-                    { q: "Que signifie le 'D' dans la séquence DHCP DORA ?", options: ["Domain", "Discover", "Deliver"], correct: 1, hint: "Le client cherche le serveur dans un premier temps." },
-                    { q: "Quel enregistrement DNS associe un nom de domaine à une adresse IPv4 ?", options: ["CNAME", "MX", "Enregistrement A"], correct: 2, hint: "C'est la première lettre de l'alphabet." }
+                    { q: "Un PC fait un DHCP Discover. Le serveur DHCP n'est pas dans le même sous-réseau. Que faut-il configurer sur le routeur ?", options: ["Un agent relais DHCP (ip helper-address)", "Rien, le broadcast traverse les routeurs", "Un NAT statique"], correct: 0, hint: "Le routeur transforme le broadcast DHCP en message Unicast ciblé vers le serveur." },
+                    { q: "Que gère le paramètre 'Durée du bail' (Lease Time) d'un serveur DHCP ?", options: ["La durée de validité du mot de passe WiFi", "La durée pendant laquelle l'IP est prêtée au client avant qu'il doive la renouveler", "Le temps de réponse du serveur"], correct: 1, hint: "C'est un prêt, pas un don à vie." },
+                    { q: "Quel enregistrement DNS est consulté lorsqu'on envoie un email à 'contact@entreprise.com' ?", options: ["CNAME", "A", "MX (Mail Exchange)", "NS"], correct: 2, hint: "Il indique vers quel serveur router le courrier." },
+                    { q: "Sur Windows, quelle commande vide le cache DNS local du PC ?", options: ["ipconfig /renew", "ipconfig /flushdns", "netsh winsock reset"], correct: 1, hint: "Action indispensable quand un site a changé d'IP récemment." }
                 ]
             },
 
-            // --- LINUX ---
+            // ==========================================
+            // CHAPITRE : LINUX
+            // ==========================================
             'lin-cmd': {
-                course: `<div class="prose"><h3>Navigation Linux</h3><ul><li><code>pwd</code> : Dossier actuel</li><li><code>ls -la</code> : Lister tout (même cachés)</li><li><code>cd /var/log</code> : Se déplacer</li><li><code>grep</code> : Chercher du texte</li><li><code>cat</code> : Lire un fichier</li></ul></div>`,
+                course: `<div class="prose"><h3>CLI & Flux de données</h3><p>Sous Linux, tout est fichier.<br><strong>Redirections :</strong> <code>></code> écrase le fichier, <code>>></code> ajoute à la fin.<br><strong>Pipe <code>|</code> :</strong> Envoie la sortie d'une commande comme entrée de la suivante (Ex: <code>cat syslog | grep error</code>).<br><code>find / -name "test"</code> : Recherche de fichiers.</p></div>`,
                 questions: [
-                    { q: "Quelle commande cherche un mot spécifique dans un fichier texte ?", options: ["find", "grep", "search"], correct: 1, hint: "Acronyme de Global Regular Expression Print." },
-                    { q: "Comment lister TOUS les fichiers (même cachés) ?", options: ["ls -l", "ls -a", "dir /all"], correct: 1, hint: "Le paramètre correspond à 'all'." }
+                    { q: "Je veux ajouter le mot 'Coucou' à la fin du fichier log.txt, SANS écraser son contenu. Quelle commande utiliser ?", options: ["echo 'Coucou' > log.txt", "echo 'Coucou' >> log.txt", "cat 'Coucou' > log.txt"], correct: 1, hint: "Le double chevron est le mode 'Append' (Ajouter)." },
+                    { q: "À quoi sert le caractère 'pipe' ( | ) ?", options: ["À chaîner les commandes conditionnellement", "À rediriger le résultat d'une commande vers l'entrée de la suivante", "À créer un lien symbolique"], correct: 1, hint: "C'est la base de la tuyauterie sous Linux." },
+                    { q: "Quelle commande permet d'afficher les 10 dernières lignes d'un fichier log en direct (mise à jour en temps réel) ?", options: ["cat file.log", "tail -f file.log", "head -n 10 file.log", "less file.log"], correct: 1, hint: "Le paramètre -f signifie 'follow'." },
+                    { q: "Laquelle de ces commandes archive et compresse un dossier en .tar.gz ?", options: ["tar -cvzf archive.tar.gz /dossier", "zip /dossier archive", "gzip /dossier"], correct: 0, hint: "Create, Verbose, Z(gzip), File." }
                 ]
             },
             'lin-perm': {
-                course: `<div class="prose"><h3>Droits Linux</h3><p>Format : <strong>Proprio | Groupe | Autres</strong>. <br>Droits : <code>r</code> (4), <code>w</code> (2), <code>x</code> (1).</p><p>Ex: <code>chmod 755 fichier</code> donne rwx (7) au proprio, rx (5) aux autres.<br><code>chown user:group</code> change le propriétaire.</p></div>`,
+                course: `<div class="prose"><h3>Droits & Sécurité Avancée</h3><p>Rappel : r(4), w(2), x(1).<br><strong>Umask :</strong> Soustrait les droits par défaut à la création.<br><strong>SUID (chmod 4000) :</strong> Exécute un fichier avec les droits du propriétaire (souvent root, dangereux !).<br>Fichiers critiques : <code>/etc/passwd</code> (utilisateurs), <code>/etc/shadow</code> (mots de passe chiffrés).</p></div>`,
                 questions: [
-                    { q: "À quelle valeur numérique correspond la lecture (r) ?", options: ["1", "2", "4"], correct: 2, hint: "x=1, w=2, r=?" },
-                    { q: "Que fait 'chmod 777' ?", options: ["Tous les droits à tous", "Bloque le fichier", "Exécutable uniquement"], correct: 0, hint: "4+2+1 = 7 (rwx)." }
+                    { q: "Que donne un 'chmod 644' sur un fichier ?", options: ["rw-r--r--", "rwx-r-xr-x", "rw-rw-r--"], correct: 0, hint: "Propriétaire = 4+2, Groupe = 4, Autres = 4." },
+                    { q: "Qu'est-ce que le bit SUID appliqué à un script Bash ?", options: ["Il rend le fichier ineffaçable", "Lorsqu'un utilisateur le lance, le script s'exécute avec les privilèges du propriétaire du fichier", "Il cache le fichier"], correct: 1, hint: "Très utile pour la commande 'passwd' par exemple, mais dangereux si mal géré." },
+                    { q: "Seul l'utilisateur 'root' a le droit de lire le fichier '/etc/shadow'. Pourquoi ?", options: ["Il contient l'historique des commandes", "Il contient les hashs (empreintes) des mots de passe de tous les utilisateurs", "C'est le fichier de boot"], correct: 1, hint: "S'il était lisible par tous, n'importe qui pourrait tenter de casser les mots de passe hors ligne." },
+                    { q: "Quelle commande permet de changer le groupe propriétaire d'un fichier ?", options: ["chown", "chgrp (ou chown :groupe)", "chmod"], correct: 1, hint: "CHange GRouP." }
+                ]
+            },
+            'lin-net': {
+                course: `<div class="prose"><h3>Configuration Réseau OS</h3><p>Ancien : <code>ifconfig</code>, <code>route</code>, <code>/etc/network/interfaces</code>.<br>Moderne : <code>ip addr</code>, <code>ip route</code>, <code>Netplan</code> (Ubuntu) ou <code>NetworkManager</code>.<br>DNS client : <code>/etc/resolv.conf</code>.</p></div>`,
+                questions: [
+                    { q: "Un serveur Linux n'arrive plus à résoudre 'google.fr', mais le ping 8.8.8.8 fonctionne. Quel fichier faut-il vérifier en priorité ?", options: ["/etc/hosts", "/etc/network/interfaces", "/etc/resolv.conf"], correct: 2, hint: "C'est lui qui indique à l'OS quel serveur DNS interroger." },
+                    { q: "Quelle commande (moderne) affiche la table de routage du noyau Linux ?", options: ["ip route show", "netstat -r", "route print"], correct: 0, hint: "La suite 'iproute2' a remplacé net-tools." },
+                    { q: "À quoi sert le fichier '/etc/hosts' ?", options: ["À configurer l'adresse IP de la machine", "À faire une résolution DNS locale manuelle (Nom <-> IP) sans interroger de serveur DNS", "À bloquer des adresses IP"], correct: 1, hint: "C'est l'ancêtre du DNS, l'OS le lit en tout premier." },
+                    { q: "Sous Ubuntu récent, quel outil utilise des fichiers YAML pour configurer le réseau ?", options: ["ifupdown", "Netplan", "SysVinit"], correct: 1, hint: "C'est l'outil canonique d'Ubuntu." }
                 ]
             },
             'lin-srv': {
-                course: `<div class="prose"><h3>Systemd (systemctl)</h3><p>Gestionnaire de services sous Linux.</p><ul><li><code>systemctl start apache2</code> : Démarre le service</li><li><code>systemctl enable apache2</code> : Lancement auto au boot</li><li><code>systemctl status apache2</code> : Vérifie l'état</li></ul></div>`,
+                course: `<div class="prose"><h3>Systemd & Services</h3><p><strong>Systemd</strong> remplace Init. Il gère les 'units' (services, sockets, targets).<br><code>systemctl daemon-reload</code> : À lancer après modification d'un fichier de service.<br><strong>Journalctl :</strong> Outil centralisé pour lire les logs générés par systemd.</p></div>`,
                 questions: [
-                    { q: "Quelle commande active un service au démarrage de la machine ?", options: ["systemctl start", "systemctl boot", "systemctl enable"], correct: 2, hint: "Il faut l'habiliter." },
-                    { q: "Comment vérifier si un service a planté ?", options: ["systemctl status", "systemctl check", "systemctl log"], correct: 0, hint: "On demande son statut." }
+                    { q: "Vous avez modifié le fichier de configuration du service Nginx (/etc/systemd/system/nginx.service). Quelle commande exécuter avant de le redémarrer ?", options: ["systemctl restart nginx", "systemctl daemon-reload", "reboot"], correct: 1, hint: "Il faut dire à Systemd de recharger ses fichiers de configuration." },
+                    { q: "Comment lire uniquement les logs d'erreurs récents du service SSH ?", options: ["journalctl -u sshd -n 50", "cat /var/log/messages | grep ssh", "systemctl status sshd --logs"], correct: 0, hint: "Le paramètre -u spécifie l'Unit." },
+                    { q: "Que signifie 'systemctl mask apache2' ?", options: ["Rend le service invisible", "Désactive le service de façon stricte (lien vers /dev/null), empêchant son lancement même manuellement", "Masque les logs du service"], correct: 1, hint: "C'est plus fort qu'un simple 'disable'." },
+                    { q: "Qu'est-ce qu'une 'Target' dans Systemd (ex: multi-user.target) ?", options: ["La cible réseau du serveur", "L'équivalent d'un runlevel, un état global du système regroupant plusieurs services", "Un pare-feu"], correct: 1, hint: "Par exemple, graphical.target lance l'interface graphique." }
                 ]
             },
             'lin-apt': {
-                course: `<div class="prose"><h3>Gestion APT (Debian/Ubuntu)</h3><p>Outil de gestion de paquets (Advanced Package Tool).</p><ul><li><code>apt update</code> : Met à jour la liste des paquets dispo</li><li><code>apt upgrade</code> : Installe les mises à jour</li><li><code>apt purge</code> : Désinstalle un paquet ET ses configs</li></ul></div>`,
+                course: `<div class="prose"><h3>Gestion des Paquets (Debian/Ubuntu)</h3><p>APT gère les dépendances, DPKG installe les fichiers bruts (.deb).<br>Dépôts configurés dans <code>/etc/apt/sources.list</code>.<br>Ajout de dépôt externe souvent via <strong>PPA</strong> ou ajout de la clé GPG.</p></div>`,
                 questions: [
-                    { q: "Que fait 'apt update' ?", options: ["Met à jour le système entier", "Rafraîchit la liste des paquets", "Désinstalle les vieux paquets"], correct: 1, hint: "Ne télécharge pas de nouveaux logiciels, juste l'index." },
-                    { q: "Comment supprimer un logiciel ET ses fichiers de configuration ?", options: ["apt remove", "apt delete", "apt purge"], correct: 2, hint: "Une suppression totale." }
+                    { q: "Quelle est la différence entre 'apt upgrade' et 'apt full-upgrade' (ou dist-upgrade) ?", options: ["Aucune", "full-upgrade peut supprimer des paquets existants pour satisfaire de nouvelles dépendances", "full-upgrade installe une nouvelle version de l'OS complet"], correct: 1, hint: "Le full-upgrade est plus agressif lors des changements majeurs." },
+                    { q: "J'ai téléchargé un fichier 'logiciel.deb' sur internet. Comment l'installer localement ?", options: ["apt install ./logiciel.deb", "dpkg -i logiciel.deb", "Les deux fonctionnent sous les OS récents"], correct: 2, hint: "Historiquement c'était dpkg, mais apt sait le faire maintenant (et gère les dépendances)." },
+                    { q: "Où APT va-t-il chercher les URL des serveurs pour télécharger les paquets ?", options: ["/var/cache/apt", "/etc/apt/sources.list", "/etc/dpkg.conf"], correct: 1, hint: "C'est la liste des sources." },
+                    { q: "Que fait 'apt autoremove' ?", options: ["Désinstalle tous les logiciels inutiles", "Supprime les dépendances orphelines qui ont été installées pour un logiciel depuis supprimé", "Vide le cache téléchargement"], correct: 1, hint: "Nettoie le système des bibliothèques mortes." }
                 ]
             },
             'lin-lvm': {
-                course: `<div class="prose"><h3>Stockage LVM</h3><p>Gestion logique des volumes pour plus de flexibilité.</p><ol><li><strong>PV (Physical Volume) :</strong> Disques physiques.</li><li><strong>VG (Volume Group) :</strong> Regroupe les PV.</li><li><strong>LV (Logical Volume) :</strong> Les partitions finales à formater.</li></ol></div>`,
+                course: `<div class="prose"><h3>LVM & Systèmes de Fichiers</h3><p><strong>LVM :</strong> Physical Volume (PV) -> Volume Group (VG) -> Logical Volume (LV).<br>Formatage : <code>mkfs.ext4</code> ou <code>mkfs.xfs</code>.<br>Montage persistant : <code>/etc/fstab</code>.<br>Agrandissement : <code>lvextend -r -L +10G /dev/vg0/lv0</code> (le -r redimensionne le FS direct).</p></div>`,
                 questions: [
-                    { q: "Quel est l'ordre logique de création en LVM ?", options: ["LV -> VG -> PV", "PV -> VG -> LV", "VG -> PV -> LV"], correct: 1, hint: "Physique -> Groupe -> Logique." },
-                    { q: "Quel est le grand avantage de LVM ?", options: ["Plus rapide qu'un RAID", "Redimensionner à chaud sans reboot", "Chiffre les données par défaut"], correct: 1, hint: "Flexibilité." }
+                    { q: "Vous venez de rajouter un disque dur (/dev/sdb) au serveur. Quelle est la toute première commande LVM à lancer ?", options: ["vgcreate /dev/sdb", "pvcreate /dev/sdb", "lvcreate /dev/sdb"], correct: 1, hint: "Il faut d'abord le déclarer comme Volume Physique." },
+                    { q: "Après avoir agrandi un LV (Volume Logique) Ext4 avec 'lvextend', le système voit toujours l'ancienne taille. Pourquoi ?", options: ["Il faut redémarrer le serveur", "Il faut agrandir le système de fichiers (resize2fs) contenu dans le LV", "LVM est buggé"], correct: 1, hint: "LVM donne la boîte, mais le système de fichiers à l'intérieur doit être étiré pour remplir la boîte." },
+                    { q: "Quel fichier faut-il éditer pour qu'une partition soit montée automatiquement au démarrage ?", options: ["/etc/mount", "/etc/fstab", "/etc/mtab"], correct: 1, hint: "File System TABle." },
+                    { q: "Quel est l'avantage énorme des Snapshots (Instantanés) LVM ?", options: ["Ils chiffrent les données", "Ils gèlent l'état du volume à un instant T (pratique avant une mise à jour risquée)", "Ils augmentent les performances"], correct: 1, hint: "C'est une sauvegarde éclair." }
                 ]
             },
             'lin-bash': {
-                course: `<div class="prose"><h3>Scripts Bash</h3><p>Un script commence toujours par le Shebang : <code>#!/bin/bash</code>.</p><p>Il faut le rendre exécutable avec : <code>chmod +x script.sh</code>.<br>On l'exécute avec : <code>./script.sh</code>.</p></div>`,
+                course: `<div class="prose"><h3>Scripting Bash</h3><p>Variables : <code>$VAR</code>. Arguments : <code>$1</code>, <code>$2</code>.<br>Conditions : <code>if [ -f fichier.txt ]; then...</code> (-f vérifie si c'est un fichier).<br>Boucle : <code>for i in {1..5}; do...</code><br>Code retour : <code>$?</code> (0 = Succès, autre = Erreur).</p></div>`,
                 questions: [
-                    { q: "Comment appelle-t-on la première ligne '#!/bin/bash' ?", options: ["Le header", "Le shebang", "L'init"], correct: 1, hint: "Mot composé de 'hash' et 'bang'." },
-                    { q: "Quelle commande rend le script exécutable ?", options: ["chmod +e", "chmod +x", "chown +x"], correct: 1, hint: "x pour eXecute." }
+                    { q: "Dans un script bash, à quoi correspond la variable spéciale '$?' ?", options: ["Au code de retour (succès/échec) de la dernière commande exécutée", "Au nombre d'arguments passés au script", "Au PID du script"], correct: 0, hint: "Crucial pour faire de la gestion d'erreur. 0 = tout va bien." },
+                    { q: "Que teste la condition 'if [ -d /backup ]' ?", options: ["Si le dossier /backup est supprimé", "Si /backup existe et est un répertoire (directory)", "Si /backup a les droits root"], correct: 1, hint: "La lettre 'd' est l'indice." },
+                    { q: "Comment affecter le résultat de la commande 'date' à une variable ?", options: ["VAR=date", "VAR=$(date)", "VAR=$date"], correct: 1, hint: "L'évaluation de commande se fait avec $(...) ou les backticks." },
+                    { q: "Dans un script exécuté via './script.sh user1', que contient la variable '$1' ?", options: ["Le nom du script", "La chaîne 'user1'", "Rien"], correct: 1, hint: "C'est le premier argument (paramètre positionnel)." }
                 ]
             },
 
-            // --- WINDOWS ---
+            // ==========================================
+            // CHAPITRE : WINDOWS SERVER
+            // ==========================================
             'win-ad': {
-                course: `<div class="prose"><h3>Active Directory (AD DS)</h3><p>Annuaire basé sur LDAP et Kerberos (authentification).</p><ul><li><strong>Domaine :</strong> Frontière logique et de sécurité.</li><li><strong>OU :</strong> Unité Organisationnelle pour classer (PC/Users) et appliquer des GPO.</li></ul></div>`,
+                course: `<div class="prose"><h3>Active Directory Avancé</h3><p>Base de données : <code>NTDS.DIT</code>.<br><strong>FSMO Roles (5) :</strong> Maître de Schéma, Maître d'attribution des noms, PDC Emulator (Temps, GPO, Mots de passe), Maître RID, Maître d'infrastructure.<br><strong>Catalogue Global (GC) :</strong> Index partiel de tous les objets de la forêt.</p></div>`,
                 questions: [
-                    { q: "Quel protocole gère l'authentification dans l'AD ?", options: ["NTLM", "Kerberos", "LDAP"], correct: 1, hint: "Le chien à 3 têtes." },
-                    { q: "À quoi sert une OU ?", options: ["Créer un domaine", "Regrouper des objets pour appliquer des GPO", "Faire des sauvegardes"], correct: 1, hint: "C'est un dossier d'organisation." }
+                    { q: "Si le rôle FSMO 'Émulateur PDC' tombe en panne, quel symptôme immédiat risque de se produire ?", options: ["Impossible de créer de nouveaux utilisateurs", "Désynchronisation de l'heure des PC et problèmes de verrouillage de comptes", "Perte de tous les DNS"], correct: 1, hint: "C'est le maître du temps et l'arbitre ultime des mots de passe." },
+                    { q: "Qu'est-ce qu'une relation d'approbation (Trust) dans l'AD ?", options: ["Un lien sécurisé entre deux domaines pour permettre le partage de ressources", "Un certificat SSL sur le contrôleur", "Une sauvegarde du domaine"], correct: 0, hint: "Permet aux utilisateurs de l'Entreprise A de se connecter aux serveurs de l'Entreprise B." },
+                    { q: "À quoi sert le Catalogue Global (GC) ?", options: ["C'est un catalogue des logiciels installables", "Il permet d'accélérer les recherches d'objets (comme l'authentification) sur toute la forêt", "C'est l'interface d'administration"], correct: 1, hint: "C'est un annuaire téléphonique rapide pour tous les domaines." },
+                    { q: "Où se trouve physiquement la base de données de l'Active Directory sur un contrôleur de domaine ?", options: ["C:\\Windows\\System32\\AD.db", "C:\\Windows\\NTDS\\ntds.dit", "C:\\Program Files\\AD"], correct: 1, hint: "NT Directory Services." }
                 ]
             },
             'win-gpo': {
-                course: `<div class="prose"><h3>Stratégies de Groupe (GPO)</h3><p>Déploiement de configs (sécurité, lecteurs).</p><ul><li><strong>Config Ordinateur :</strong> S'applique au démarrage du PC.</li><li><strong>Config Utilisateur :</strong> S'applique à l'ouverture de session.</li></ul><p>Forcer la MAJ : <code>gpupdate /force</code>.</p></div>`,
+                course: `<div class="prose"><h3>Stratégies de Groupe (GPO)</h3><p>Ordre d'application (LSDOU) : Local -> Site -> Domaine -> OU.<br>La dernière appliquée écrase les précédentes.<br><strong>Filtre WMI :</strong> Permet de cibler la GPO selon le matériel (Ex: Appliquer que sur Windows 10).<br><strong>Traitement par bouclage (Loopback) :</strong> Force les GPO Utilisateurs rattachées à l'OU de l'Ordinateur.</p></div>`,
                 questions: [
-                    { q: "Quand s'applique la 'Configuration Utilisateur' d'une GPO ?", options: ["Au démarrage du PC", "À l'ouverture de session", "À minuit"], correct: 1, hint: "Le PC doit savoir qui se connecte." },
-                    { q: "Quelle commande force l'actualisation locale des GPO ?", options: ["gpupdate /force", "gpo /sync", "update-ad"], correct: 0, hint: "Group Policy Update." }
+                    { q: "Une GPO liée au Domaine interdit l'accès au Panneau de Configuration. Une autre GPO liée à l'OU 'Compta' autorise cet accès. Que se passe-t-il pour un comptable ?", options: ["Il a accès (l'OU gagne car appliquée en dernier)", "Il n'a pas accès (le Domaine est prioritaire)", "GPO en conflit, rien ne s'applique"], correct: 0, hint: "Règle LSDOU : le plus proche de l'objet (l'OU) a le dernier mot." },
+                    { q: "Que permet de faire un Filtre WMI sur une GPO ?", options: ["Filtrer par groupe de sécurité", "N'appliquer la GPO que si le PC a certaines caractéristiques (ex: OS = Windows 11, ou RAM > 4Go)", "Filtrer les adresses MAC"], correct: 1, hint: "Windows Management Instrumentation." },
+                    { q: "À quoi sert le traitement par bouclage (Loopback Processing) ?", options: ["À répéter une GPO en boucle", "À appliquer des paramètres 'Utilisateur' basés sur l'emplacement de 'l'Ordinateur' (ex: Kiosk, Salle de formation)", "À redémarrer le PC distant"], correct: 1, hint: "Dans une salle de classe, on veut brider le compte utilisateur, peu importe qui s'y connecte." },
+                    { q: "Dans quel dossier partagé par défaut sur les Contrôleurs de Domaine sont stockés les fichiers des GPO ?", options: ["NETLOGON", "SYSVOL", "GPO_SHARE"], correct: 1, hint: "SYStem VOLume." }
                 ]
             },
             'win-wds': {
-                course: `<div class="prose"><h3>WDS (Windows Deployment Services)</h3><p>Rôle serveur permettant d'installer Windows par le réseau sans clé USB.</p><p>S'appuie sur le protocole <strong>PXE</strong> (Preboot eXecution Environment) pour démarrer la carte réseau avant l'OS. Nécessite un DHCP et un DNS.</p></div>`,
+                course: `<div class="prose"><h3>WDS (Déploiement)</h3><p>Utilise PXE (DHCP + TFTP).<br>Deux types d'images (format <code>.wim</code>) :<br>1. <strong>Image de Démarrage (Boot.wim) :</strong> Le mini-OS (WinPE) chargé en RAM par le réseau.<br>2. <strong>Image d'Installation (Install.wim) :</strong> Le vrai Windows à copier sur le disque dur.</p></div>`,
                 questions: [
-                    { q: "Quel protocole permet à un PC de booter sur le réseau ?", options: ["TFTP", "PXE", "NTP"], correct: 1, hint: "Preboot eXecution Environment." },
-                    { q: "WDS nécessite la présence obligatoire de quel autre service ?", options: ["DHCP", "IIS", "Hyper-V"], correct: 0, hint: "Le PC a besoin d'une IP pour joindre le serveur WDS." }
+                    { q: "Dans WDS, à quoi sert l'Image de Démarrage (Boot image) ?", options: ["C'est l'OS complet avec Office installé", "C'est un environnement WinPE léger chargé en RAM pour lancer le processus d'installation", "C'est un driver réseau"], correct: 1, hint: "Le PC a besoin d'un mini-cerveau réseau pour télécharger la suite." },
+                    { q: "Si le serveur WDS et les PC clients ne sont pas sur le même réseau (VLAN différent), que faut-il configurer sur le routeur ?", options: ["Un NAT", "L'option DHCP 66 et 67, ou un agent relais IP Helper pour les requêtes PXE/DHCP", "Un VPN"], correct: 1, hint: "Le PXE s'appuie sur le broadcast DHCP." },
+                    { q: "Quel est le grand avantage de la transmission Multidiffusion (Multicast) dans WDS ?", options: ["Chiffrer le déploiement", "Déployer 50 PC en même temps sans saturer la bande passante du serveur (un seul flux envoyé)", "Installer plusieurs OS en même temps"], correct: 1, hint: "Le serveur parle, les 50 PC écoutent le même canal." },
+                    { q: "Quel outil Microsoft permet de modifier une image .wim hors ligne (ajouter des pilotes, des MAJ) ?", options: ["Sysprep", "DISM (Deployment Image Servicing and Management)", "Diskpart"], correct: 1, hint: "Outil en ligne de commande ultra puissant pour les images Windows." }
                 ]
             },
             'win-mdt': {
-                course: `<div class="prose"><h3>MDT (Microsoft Deployment Toolkit)</h3><p>Outil d'automatisation de déploiement (gratuit).</p><p>Contrairement à WDS (qui distribue l'image), MDT permet de créer des <strong>Séquences de Tâches</strong> (Task Sequences) pour installer des logiciels, injecter des drivers et joindre le domaine de façon "Zero Touch".</p></div>`,
+                course: `<div class="prose"><h3>MDT (Automatisation)</h3><p>MDT complète WDS. Il gère :<br><strong>Séquences de Tâches :</strong> Liste des étapes (Formater, Installer OS, Injecter Pilotes, Joindre Domaine).<br><strong>CustomSettings.ini :</strong> Fichier de règles pour automatiser les choix (Langue, Nom du PC).<br><strong>Lite Touch (LTI) vs Zero Touch (ZTI, nécessite SCCM).</strong></p></div>`,
                 questions: [
-                    { q: "Quel est le concept clé de MDT pour automatiser l'installation ?", options: ["Les GPO", "Les Task Sequences", "Les Scripts Batch"], correct: 1, hint: "Séquences de tâches en anglais." },
-                    { q: "MDT et WDS sont-ils concurrents ou complémentaires ?", options: ["Concurrents", "Complémentaires"], correct: 1, hint: "WDS amorce, MDT automatise." }
+                    { q: "Quelle est la fonction principale d'une Séquence de Tâches (Task Sequence) dans MDT ?", options: ["Faire des sauvegardes", "Définir l'ordre précis des actions (Formatage, OS, Drivers, Logiciels) à effectuer sur le client", "Gérer les GPO"], correct: 1, hint: "C'est un script maître." },
+                    { q: "À quoi sert le fichier 'CustomSettings.ini' dans MDT ?", options: ["Stocker les mots de passe de l'AD", "Pré-remplir les réponses de l'assistant de déploiement (Nom du PC, Langue) pour automatiser", "Configurer le pare-feu du serveur"], correct: 1, hint: "Il permet de tendre vers du Zero-Touch." },
+                    { q: "Comment MDT gère-t-il l'injection des pilotes (Drivers) matériel ?", options: ["Il télécharge tout sur Windows Update", "Il injecte 'Out-of-Box' uniquement les pilotes correspondant au modèle du PC (Plug and Play)", "Il installe tous les pilotes de la base sur chaque PC"], correct: 1, hint: "MDT lit la marque et le modèle dans le BIOS via WMI, et ne prend que ce qui correspond." },
+                    { q: "Que doit-on faire avec Sysprep avant de capturer une image de référence (Master) ?", options: ["Générer un rapport d'erreur", "Généraliser l'OS (retirer les identifiants uniques SID et infos matérielles)", "Activer la licence Windows"], correct: 1, hint: "Si on ne le fait pas, tous les PC déployés auront le même ADN réseau (SID) et créeront un conflit dans l'AD." }
                 ]
             },
             'win-ps': {
-                course: `<div class="prose"><h3>PowerShell</h3><p>Langage de script Microsoft orienté <strong>Objet</strong> (contrairement à Bash qui est orienté texte).</p><p>Verbes standards : <code>Get</code>, <code>Set</code>, <code>New</code>, <code>Remove</code>.<br>Commande de survie : <code>Get-Help Nom-Cmdlet -Examples</code>.</p></div>`,
+                course: `<div class="prose"><h3>PowerShell Avancé</h3><p>Manipulation d'objets : <code>Get-Service | Where-Object Status -eq 'Running'</code>.<br>Gérer l'AD : <code>Import-Module ActiveDirectory</code>.<br>Sécurité : ExecutionPolicy (Restricted, RemoteSigned, Unrestricted). Pour exécuter un script : <code>Set-ExecutionPolicy RemoteSigned</code>.</p></div>`,
                 questions: [
-                    { q: "Quelle est la grande différence de PowerShell face à cmd ?", options: ["Il est plus lent", "Il est orienté Objet", "Il ne marche que sur Windows"], correct: 1, hint: "Il manipule des structures de données complexes, pas juste du texte." },
-                    { q: "Comment obtenir la doc d'une commande ?", options: ["man cmd", "Get-Help cmd", "info cmd"], correct: 1, hint: "Obtenir l'aide." }
+                    { q: "Pourquoi dit-on que PowerShell manipule des Objets, contrairement à Bash ?", options: ["Parce qu'il a une interface graphique", "Parce que le résultat d'une commande contient des propriétés et méthodes (ex: processus.Name), pas juste du texte brut", "C'est faux, il manipule du texte"], correct: 1, hint: "Un processus sous PS a des propriétés cachées (utilisation CPU, propriétaire) accessibles via son objet." },
+                    { q: "Quelle commande permet de ne conserver que les processus consommant plus de 100 Mo de RAM ?", options: ["Get-Process > 100MB", "Get-Process | Where-Object WS -gt 100MB", "find process 100M"], correct: 1, hint: "On utilise le Pipe pour passer les processus au filtre (Where)." },
+                    { q: "Vous essayez de lancer un script .ps1, mais Windows refuse en disant 'L'exécution de scripts est désactivée'. Que faire ?", options: ["Lancer PS en administrateur", "Changer la stratégie via 'Set-ExecutionPolicy RemoteSigned'", "Compiler le script en .exe"], correct: 1, hint: "C'est une protection native de Windows contre les scripts malveillants." },
+                    { q: "Quel cmdlet permet de créer un nouvel utilisateur dans l'Active Directory ?", options: ["Add-ADUser", "New-ADUser", "Create-UserAD"], correct: 1, hint: "PowerShell utilise le standard Verbe-Nom (New = Créer ex-nihilo)." }
                 ]
             },
             'win-fs': {
-                course: `<div class="prose"><h3>NTFS & Partages</h3><p>Double couche de sécurité sur Windows :</p><ol><li><strong>Droits de Partage :</strong> Sécurité réseau (souvent 'Tout le monde: Contrôle Total').</li><li><strong>Droits NTFS :</strong> Sécurité réelle sur le disque (Propriétaire, Lecture, Modif).</li></ol><p>La règle : Le droit effectif est <strong>le plus restrictif</strong> des deux.</p></div>`,
+                course: `<div class="prose"><h3>Partages, NTFS & DFS</h3><p>Règle d'or : Le droit effectif final est le plus <strong>restrictif</strong> entre le Partage réseau et NTFS.<br><strong>Héritage :</strong> Par défaut, un sous-dossier hérite des droits du parent. On peut 'casser' l'héritage.<br><strong>DFS (Distributed File System) :</strong> Crée un nom d'espace global (ex: <code>\\\\domaine.local\\Donnees</code>) pointant vers plusieurs serveurs (Haute dispo).</p></div>`,
                 questions: [
-                    { q: "Si un partage autorise la Lecture, mais NTFS autorise la Modification, que peut faire l'utilisateur par le réseau ?", options: ["Modifier", "Lire seulement", "Rien"], correct: 1, hint: "La règle du plus restrictif l'emporte." },
-                    { q: "Lequel gère la sécurité même si on se connecte localement (devant le PC) ?", options: ["Le Partage", "Le NTFS", "Le Pare-feu"], correct: 1, hint: "C'est le système de fichiers physique." }
+                    { q: "Le dossier \\\\SRV1\\RH a les droits Partage: 'Tout le monde: Lecture'. Les droits NTFS sont: 'Compta: Modif', 'RH: Modif'. Que peut faire un membre RH via le réseau ?", options: ["Modifier", "Lire uniquement", "Rien"], correct: 1, hint: "Le Partage bride l'accès avant même que NTFS ne soit consulté." },
+                    { q: "Comment créer un partage réseau 'caché' (qui n'apparaît pas dans l'explorateur réseau) sous Windows ?", options: ["Cocher 'Dossier caché'", "Ajouter un '$' à la fin du nom de partage (ex: Admin$)", "Ce n'est pas possible"], correct: 1, hint: "C'est un standard Microsoft, comme pour les partages d'administration par défaut (C$)." },
+                    { q: "Quel est l'intérêt d'un espace de noms DFS (Distributed File System) ?", options: ["Chiffrer les disques", "Proposer un point d'accès unique (chemin logique) pour des dossiers répartis sur plusieurs serveurs physiques", "Faire des sauvegardes incrémentielles"], correct: 1, hint: "Si SRV1 meurt, on le remplace par SRV2, mais le chemin DFS ne change pas pour les utilisateurs." },
+                    { q: "Si vous déplacez (Couper/Coller) un fichier dans un autre dossier sur le MÊME volume NTFS, que deviennent ses droits ?", options: ["Ils sont remis à zéro", "Il garde ses droits NTFS d'origine", "Il hérite immédiatement des droits du nouveau dossier parent"], correct: 1, hint: "Sur le même volume, le fichier n'est pas recréé, juste l'index qui est mis à jour. Il conserve son ADN." }
                 ]
             },
 
-            // --- VIRT & SEC ---
+            // ==========================================
+            // CHAPITRE : VIRTUALISATION & SECU
+            // ==========================================
             'virt-prox': {
-                course: `<div class="prose"><h3>Proxmox VE</h3><p>Hyperviseur Bare-Metal (Type 1) open-source basé sur Debian.</p><ul><li><strong>KVM :</strong> Machine Virtuelle complète (noyau séparé).</li><li><strong>LXC :</strong> Conteneurs Linux (partage le noyau Proxmox, ultra léger).</li></ul></div>`,
+                course: `<div class="prose"><h3>Proxmox & Stockage Virtuel</h3><p><strong>Cluster :</strong> Regroupement de serveurs (Nœuds) pour gérer les VMs depuis une seule interface.<br><strong>HA (High Availability) :</strong> Si Nœud A plante, la VM redémarre toute seule sur Nœud B (Nécessite un stockage partagé).<br>Stockages supportés : ZFS (Raid logiciel très puissant), Ceph (Distribué sur réseau), LVM-Thin.</p></div>`,
                 questions: [
-                    { q: "Sur quel OS de base tourne Proxmox ?", options: ["Ubuntu", "CentOS", "Debian"], correct: 2, hint: "L'OS avec la spirale rouge." },
-                    { q: "Que signifie un hyperviseur de Type 1 ?", options: ["Il s'installe dans Windows", "Il s'installe directement sur le matériel (Bare-Metal)", "Il ne fait que des conteneurs"], correct: 1, hint: "Pas de système hôte intermédiaire." }
+                    { q: "Pour que la Haute Disponibilité (HA) fonctionne et déplace une VM en cas de crash, quelle est la condition technique absolue ?", options: ["Avoir un lien fibre 10Gbps", "Que le disque virtuel de la VM soit sur un stockage partagé (SAN/NAS/Ceph) accessible par les deux nœuds", "Avoir Windows Server"], correct: 1, hint: "Si le disque dur est physiquement coincé dans le serveur planté, l'autre serveur ne peut pas la rallumer." },
+                    { q: "Qu'est-ce que 'Ceph' dans l'écosystème Proxmox ?", options: ["L'interface web", "Un système de stockage distribué permettant de créer un SAN avec les disques locaux des serveurs", "Un pare-feu logiciel"], correct: 1, hint: "HCI (Hyper-Converged Infrastructure)." },
+                    { q: "Dans un cluster Proxmox (et les clusters en général), qu'est-ce que la notion de 'Quorum' ?", options: ["La majorité des votes des nœuds en ligne nécessaire pour que le cluster prenne des décisions (éviter le Split-Brain)", "La quantité de RAM allouée", "Le réseau dédié aux migrations"], correct: 0, hint: "C'est pour ça qu'un cluster doit avoir un nombre impair de nœuds (3, 5, 7)." },
+                    { q: "Quelle fonctionnalité permet de faire une sauvegarde d'une VM Proxmox allumée sans l'éteindre ?", options: ["Live Migration", "Snapshot (Instantané) via QEMU Agent", "Clonage"], correct: 1, hint: "Gèle l'état du disque le temps de la copie." }
                 ]
             },
             'virt-cont': {
-                course: `<div class="prose"><h3>Conteneurisation</h3><p>Ex: Docker, LXC. Contrairement aux VMs, les conteneurs n'embarquent pas leur propre système d'exploitation.</p><p>Ils <strong>partagent le noyau (Kernel)</strong> de l'hôte, ce qui les rend extrêmement rapides à démarrer et peu gourmands en RAM/CPU.</p></div>`,
+                course: `<div class="prose"><h3>Docker & Conteneurs</h3><p><strong>Image :</strong> Template en lecture seule (Recette).<br><strong>Conteneur :</strong> Instance de l'image en cours d'exécution.<br><strong>Volume :</strong> Persistance des données (Si on supprime le conteneur, le volume survit).<br><strong>Docker Compose :</strong> Fichier YAML pour lancer plusieurs conteneurs liés (Ex: Web + BDD).</p></div>`,
                 questions: [
-                    { q: "Quelle est la principale différence entre une VM et un conteneur ?", options: ["Le conteneur partage le Kernel hôte", "La VM est plus rapide", "Le conteneur n'a pas d'IP"], correct: 0, hint: "Pas d'OS complet à démarrer." },
-                    { q: "Dans Proxmox, quelle techno est utilisée pour les conteneurs ?", options: ["Docker", "Kubernetes", "LXC"], correct: 2, hint: "Linux Containers." }
+                    { q: "Si je supprime un conteneur Docker (docker rm), que deviennent les données écrites à l'intérieur (fichiers uploadés, base de données) ?", options: ["Elles sont archivées", "Elles sont définitivement perdues (sauf si un Volume Docker externe était monté)", "Elles restent dans l'image"], correct: 1, hint: "Un conteneur est éphémère par nature. On doit lier la donnée à l'hôte physique." },
+                    { q: "Dans une commande Docker, que signifie le paramètre '-p 8080:80' ?", options: ["Redirige le port 80 de l'hôte (Linux) vers le port 8080 du conteneur", "Redirige le port 8080 de l'hôte vers le port 80 du conteneur", "Limite la taille à 8080Mo"], correct: 1, hint: "Format : HOST_PORT:CONTAINER_PORT." },
+                    { q: "Quel fichier décrit la recette pour construire sa propre Image Docker (copier les fichiers, installer des dépendances) ?", options: ["docker-compose.yml", "Dockerfile", "Vagrantfile"], correct: 1, hint: "C'est le fichier source de fabrication." },
+                    { q: "Sur quoi repose techniquement l'isolation d'un conteneur LXC ou Docker sous Linux ?", options: ["Un hyperviseur matériel", "Les Cgroups (Ressources) et les Namespaces (Isolement des processus)", "Un noyau virtuel"], correct: 1, hint: "Ce sont des fonctionnalités pures du noyau Linux." }
                 ]
             },
             'sec-fw': {
-                course: `<div class="prose"><h3>Pare-feu (Firewall)</h3><p>Filtre les flux réseaux (IP, Ports, Protocoles).</p><p>Un pare-feu moderne est <strong>Stateful (à états)</strong> : s'il autorise un PC à sortir vers Internet, il autorise automatiquement le trafic retour (la réponse) sans qu'on crée de règle d'entrée.</p></div>`,
+                course: `<div class="prose"><h3>Pare-feu & Filtrage (Iptables/UFW/pfSense)</h3><p><strong>Règle par défaut (Policy) :</strong> 'DROP' tout ce qui entre, 'ACCEPT' ce qui sort.<br><strong>NAT / SNAT :</strong> Masquer les IP privées vers Internet.<br><strong>Port Forwarding (DNAT) :</strong> Autoriser Internet à joindre un serveur Web interne via un port spécifique.<br><strong>DMZ :</strong> Zone isolée du LAN pour les serveurs publics.</p></div>`,
                 questions: [
-                    { q: "Que signifie un pare-feu 'Stateful' ?", options: ["Il garde la trace des connexions actives", "Il filtre par mot de passe", "Il est hébergé dans le cloud"], correct: 0, hint: "Il gère l'état (State) des flux." },
-                    { q: "Quelle est la règle de bonne pratique par défaut pour le trafic entrant ?", options: ["Tout autoriser", "Tout bloquer (Drop)", "Autoriser uniquement le port 80"], correct: 1, hint: "Principe du moindre privilège." }
+                    { q: "Quelle est la bonne pratique absolue en matière de règles de pare-feu (Firewall) ?", options: ["Tout autoriser et bloquer ce qui est dangereux (Blacklisting)", "Tout bloquer (Implicit Deny) et n'autoriser que les flux strictement nécessaires (Whitelisting)", "Activer l'antivirus"], correct: 1, hint: "Principe du moindre privilège." },
+                    { q: "Qu'est-ce qu'une DMZ (Zone Démilitarisée) ?", options: ["Un réseau WiFi invité", "Un sous-réseau isolé hébergeant les serveurs exposés à Internet, empêchant le piratage d'atteindre le réseau LAN interne", "Un pare-feu cloud"], correct: 1, hint: "Si le serveur Web est compromis, le pirate reste enfermé dans cette zone." },
+                    { q: "Une règle de pare-feu 'Stateful' s'applique. Vous autorisez un serveur interne à interroger Internet sur le port 80. Faut-il créer une règle de retour ?", options: ["Oui, autoriser le port 80 en entrée", "Non, le pare-feu garde la connexion en mémoire et autorise dynamiquement le trafic de réponse", "Oui, autoriser tous les ports hauts"], correct: 1, hint: "Il gère l'état (State) de la session." },
+                    { q: "Dans pfSense (ou Iptables), comment appelle-t-on la technique pour rediriger le trafic arrivant sur l'IP Publique:Port 443 vers l'IP Privée d'un serveur Web interne ?", options: ["Le filtrage MAC", "Le Port Forwarding (Destination NAT / DNAT)", "Le SNAT"], correct: 1, hint: "On transfère le port." }
                 ]
             },
             'sec-vpn': {
-                course: `<div class="prose"><h3>Concepts VPN</h3><p>Réseau Privé Virtuel. Créé un tunnel chiffré sur Internet.</p><ul><li><strong>Client-to-Site :</strong> Un télétravailleur se connecte à l'entreprise (OpenVPN, Wireguard).</li><li><strong>Site-to-Site :</strong> Relie deux agences d'une même entreprise de façon transparente (souvent IPsec).</li></ul></div>`,
+                course: `<div class="prose"><h3>VPN & Cryptographie</h3><p><strong>Chiffrement Asymétrique :</strong> 1 Clé Publique (pour chiffrer) + 1 Clé Privée (pour déchiffrer) -> Certificats RSA.<br><strong>IPSec :</strong> Standard pour Site-à-Site. Fonctionne en 2 phases (IKE Phase 1: Négociation du tunnel sécurisé, IKE Phase 2: Chiffrement des données IP).<br><strong>Split-Tunneling :</strong> Seul le trafic vers l'entreprise passe dans le VPN, le reste passe par la box de la maison.</p></div>`,
                 questions: [
-                    { q: "Quel type de VPN relie 2 routeurs de 2 villes différentes de façon permanente ?", options: ["Client-to-Site", "Site-to-Site", "Proxy"], correct: 1, hint: "De site à site." },
-                    { q: "Quel protocole est la référence absolue pour du VPN Site-to-Site sécurisé ?", options: ["PPTP", "IPsec", "Telnet"], correct: 1, hint: "Internet Protocol Security." }
+                    { q: "Dans un VPN Client-à-Site avec 'Split-Tunneling' (Tunnel Divisé), que se passe-t-il quand le télétravailleur va sur YouTube ?", options: ["Le trafic passe par le VPN de l'entreprise", "Le trafic sort directement par sa box internet personnelle, sans saturer le VPN", "Youtube est bloqué"], correct: 1, hint: "Seul le trafic destiné au réseau de l'entreprise emprunte le tunnel." },
+                    { q: "Quel est le principe de la Cryptographie Asymétrique (utilisée par RSA et SSL/TLS) ?", options: ["La même clé chiffre et déchiffre", "Une clé publique chiffre le message, seule la clé privée correspondante peut le déchiffrer", "Il n'y a pas de clé, juste un mot de passe"], correct: 1, hint: "C'est la base de la sécurité web (HTTPS)." },
+                    { q: "Dans un VPN IPSec Site-à-Site, à quoi sert la phase 1 (IKE Phase 1) ?", options: ["À chiffrer le trafic utilisateur", "À authentifier les routeurs entre eux et négocier le canal sécurisé initial", "À attribuer une adresse IP au client"], correct: 1, hint: "Avant d'envoyer les données secrètes, les deux gardes du corps doivent se mettre d'accord." },
+                    { q: "Lequel de ces protocoles VPN modernes, intégré au noyau Linux, est réputé pour sa vitesse extrême et sa simplicité de configuration ?", options: ["PPTP", "OpenVPN", "WireGuard", "IPSec"], correct: 2, hint: "C'est le plus récent et performant." }
                 ]
             }
         };
